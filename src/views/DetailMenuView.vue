@@ -14,23 +14,22 @@ onMounted(() => {
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   tanggal.value = new Date().toLocaleDateString('id-ID', options)
 
-  // Cek apakah data dikirim lewat parameter QR Code
-  const dataParam = route.query.data as string
-  if (dataParam) {
+  const payload = route.query.payload as string
+  if (payload) {
     try {
-      const parsed = JSON.parse(decodeURIComponent(dataParam))
+      const decoded = JSON.parse(decodeURIComponent(payload))
       menu.value = {
-        nama: parsed.nama || 'Menu Hari Ini',
-        nutrisi: parsed.nutrisi || 'Informasi gizi belum tersedia.',
-        image: parsed.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
+        nama: decoded.n || 'Menu Hari Ini',
+        nutrisi: decoded.u || 'Informasi gizi belum tersedia.',
+        image: decoded.i || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
       }
       return
     } catch (e) {
-      console.error('Gagal memparsing data QR')
+      console.error('Gagal membaca payload')
     }
   }
 
-  // Fallback jika dibuka manual
+  // Fallback ke localStorage jika dibuka di device yang sama
   const savedData = localStorage.getItem('mbg_menu')
   if (savedData) {
     const data = JSON.parse(savedData)
@@ -42,7 +41,7 @@ onMounted(() => {
   } else {
     menu.value = {
       nama: 'Belum Ada Menu',
-      nutrisi: 'Admin belum mempublish menu makanan.',
+      nutrisi: 'Admin belum mempublish menu makanan hari ini.',
       image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
     }
   }

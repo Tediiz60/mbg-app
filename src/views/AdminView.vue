@@ -5,46 +5,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const namaMenu = ref('')
 const nutrisi = ref('')
-const fotoBase64 = ref('')
-
-const handleFileUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  if (target.files && target.files[0]) {
-    const file = target.files[0]
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      // Kompres gambar otomatis agar ukuran base64 kecil & pas discan HP
-      const img = new Image()
-      img.src = e.target?.result as string
-      img.onload = () => {
-        const canvas = document.createElement('canvas')
-        const ctx = canvas.getContext('2d')
-        const MAX_WIDTH = 300
-        const MAX_HEIGHT = 300
-        let width = img.width
-        let height = img.height
-
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width
-            width = MAX_WIDTH
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height
-            height = MAX_HEIGHT
-          }
-        }
-
-        canvas.width = width
-        canvas.height = height
-        ctx?.drawImage(img, 0, 0, width, height)
-        fotoBase64.value = canvas.toDataURL('image/jpeg', 0.6)
-      }
-    }
-    reader.readAsDataURL(file)
-  }
-}
+const imageUrl = ref('')
 
 const publishMenu = () => {
   if (!namaMenu.value || !nutrisi.value) {
@@ -55,8 +16,7 @@ const publishMenu = () => {
   const menuData = {
     nama: namaMenu.value,
     nutrisi: nutrisi.value,
-    image: fotoBase64.value || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c',
-    timestamp: Date.now()
+    image: imageUrl.value || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
   }
 
   // Simpan ke localStorage
@@ -75,8 +35,9 @@ const publishMenu = () => {
           <h1 class="text-xl font-bold text-emerald-400">ADMIN PORTAL MBG</h1>
           <p class="text-xs text-slate-400">Input & Publish Menu Makanan</p>
         </div>
+        <!-- Tombol ke Portal Siswa khusus untuk admin melihat hasil QR -->
         <router-link to="/siswa" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs px-3 py-1.5 rounded-xl font-semibold transition">
-          Buka Portal Siswa ➔
+          Lihat QR Siswa ➔
         </router-link>
       </div>
 
@@ -102,20 +63,14 @@ const publishMenu = () => {
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Upload Foto Menu Makanan</label>
+          <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Link Foto Makanan (URL Gambar)</label>
           <input 
-            type="file" 
-            accept="image/*" 
-            @change="handleFileUpload" 
-            class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-slate-800 file:text-emerald-400 hover:file:bg-slate-700 cursor-pointer border border-slate-800 rounded-xl p-1"
+            v-model="imageUrl" 
+            type="text" 
+            placeholder="Contoh: https://images.unsplash.com/photo-... (atau biarkan kosong)" 
+            class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition" 
           />
-        </div>
-
-        <div v-if="fotoBase64" class="space-y-1">
-          <p class="text-xs text-slate-400">Preview Foto:</p>
-          <div class="h-36 w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
-            <img :src="fotoBase64" alt="Preview" class="w-full h-full object-cover" />
-          </div>
+          <p class="text-[11px] text-slate-500 mt-1">Tips: Masukkan link gambar online atau biarkan kosong untuk pakai foto default.</p>
         </div>
 
         <button 

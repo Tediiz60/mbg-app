@@ -15,9 +15,13 @@ const loadMenuData = () => {
     const data = JSON.parse(savedData)
     namaMenu.value = data.nama || 'Menu Baru'
     
-    // Encode data menu ke dalam URL parameter agar HP siswa langsung bisa membacanya tanpa database
-    const compressedData = encodeURIComponent(JSON.stringify(data))
-    qrValue.value = `${window.location.origin}/detail?data=${compressedData}`
+    // Masukkan data teks ke dalam parameter URL agar langsung terbaca di HP saat discan
+    const queryData = encodeURIComponent(JSON.stringify({
+      n: data.nama,
+      u: data.nutrisi,
+      i: data.image
+    }))
+    qrValue.value = `${window.location.origin}/detail?payload=${queryData}`
   } else {
     qrValue.value = `${window.location.origin}/detail`
   }
@@ -33,14 +37,10 @@ onMounted(() => {
   <div class="min-h-screen bg-slate-950 text-white p-4 flex justify-center items-center">
     <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-center space-y-6">
       
-      <div class="flex justify-between items-center">
-        <div class="text-left">
-          <h1 class="text-xl font-extrabold text-cyan-400">SCAN MENU MBG</h1>
-          <p class="text-[11px] text-slate-400">Makan Bergizi Gratis - SMAN/SMK</p>
-        </div>
-        <router-link to="/admin" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs px-3 py-1.5 rounded-xl font-semibold transition">
-          Admin Login
-        </router-link>
+      <!-- Header bersih tanpa tombol login admin -->
+      <div class="text-left pb-2 border-b border-slate-800">
+        <h1 class="text-xl font-extrabold text-cyan-400">SCAN MENU MBG</h1>
+        <p class="text-[11px] text-slate-400">Makan Bergizi Gratis - SMAN/SMK</p>
       </div>
 
       <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 flex justify-center items-center">
@@ -56,7 +56,7 @@ onMounted(() => {
       </div>
 
       <p class="text-xs text-slate-500 italic">
-        📱 Scan QR Code di atas menggunakan HP siswa untuk melihat detail foto & nutrisi gizi makanan hari ini/besok.
+        📱 Scan QR Code di atas menggunakan HP siswa untuk melihat detail foto & nutrisi gizi makanan.
       </p>
 
     </div>
