@@ -1,63 +1,45 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
 import QrGenerator from '../components/QrGenerator.vue'
+import { supabase } from '../lib/supabase'
 
-const route = useRoute()
 const qrValue = ref('')
 const hasMenu = ref(false)
-const namaMenu = ref('Belum Ada Menu')
+const namaMenu = ref('Memuat...')
 const tanggal = ref('')
 
-const loadMenuData = () => {
+const fetchLatestMenu = async () => {
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   tanggal.value = new Date().toLocaleDateString('id-ID', options)
 
-  const queryMenu = route.query.m as string
-  const queryNutrisi = route.query.u as string
-  const queryImage = route.query.i as string
+  const { data } = await supabase
+    .from('menu')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(1)
 
-  if (queryMenu) {
+  if (data && data.length > 0) {
     hasMenu.value = true
-    namaMenu.value = queryMenu
-    localStorage.setItem('mbg_menu', JSON.stringify({
-      nama: queryMenu,
-      nutrisi: queryNutrisi || '',
-      image: queryImage || ''
-    }))
-    qrValue.value = `${window.location.origin}/detail?m=${encodeURIComponent(queryMenu)}`
-    return
+    namaMenu.value = data[0].nama
+    // QR Code mengarah ke halaman detail bersih dari cloud
+    qrValue.value = `${window.location.origin}/detail`
+  } else {
+    hasMenu.value = false
+    namaMenu.value = 'Belum Ada Menu'
+    qrValue.value = ''
   }
-
-  const savedData = localStorage.getItem('mbg_menu')
-  if (savedData) {
-    try {
-      const data = JSON.parse(savedData)
-      if (data && data.nama) {
-        hasMenu.value = true
-        namaMenu.value = data.nama
-        
-        const params = new URLSearchParams({
-          m: data.nama,
-          u: data.nutrisi || '',
-          i: data.image || ''
-        })
-        const newUrl = `${window.location.origin}/siswa?${params.toString()}`
-        window.history.replaceState({}, '', newUrl)
-
-        qrValue.value = `${window.location.origin}/detail?m=${encodeURIComponent(data.nama)}`
-        return
-      }
-    } catch (e) {}
-  }
-
-  hasMenu.value = false
-  namaMenu.value = 'Belum Ada Menu'
-  qrValue.value = ''
 }
 
 onMounted(() => {
-  loadMenuData()
+  fetchLatestMenu()
+
+  // Real-time listener: otomatis update ke semua perangkat siswa begitu admin publish
+  supabase
+    .channel('public:menu')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'menu' }, () => {
+      fetchLatestMenu()
+    })
+    .subscribe()
 })
 </script>
 
@@ -92,7 +74,7 @@ onMounted(() => {
         </div>
 
         <p class="text-xs text-slate-500 italic">
-          📱 Scan QR Code di atas menggunakan HP siswa untuk melihat detail foto & nutrisi gizi makanan.
+          📱 Scan QR Code di atas menggunakan HP siswa untuk melihat detail foto editan & nutrisi gizi makanan.
         </p>
       </div>
 

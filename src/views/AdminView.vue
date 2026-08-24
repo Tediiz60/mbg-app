@@ -1,80 +1,79 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { supabase } from '../lib/supabase'
 
-const router = useRouter()
 const namaMenu = ref('')
 const nutrisi = ref('')
-const fotoBase64 = ref('')
+const fileGambar = ref<File | null>(null)
+const previewUrl = ref('')
+const isLoading = ref(false)
 
 const handleFileUpload = (event: Event) => {
   const target = event.target as HTMLInputElement
   if (target.files && target.files[0]) {
     const file = target.files[0]
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const img = new Image()
-      img.src = e.target?.result as string
-      img.onload = () => {
-        const canvas = document.createElement('canvas')
-        const ctx = canvas.getContext('2d')
-        const MAX_WIDTH = 300
-        const MAX_HEIGHT = 300
-        let width = img.width
-        let height = img.height
-
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width
-            width = MAX_WIDTH
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height
-            height = MAX_HEIGHT
-          }
-        }
-
-        canvas.width = width
-        canvas.height = height
-        ctx?.drawImage(img, 0, 0, width, height)
-        fotoBase64.value = canvas.toDataURL('image/jpeg', 0.6)
-      }
-    }
-    reader.readAsDataURL(file)
+    fileGambar.value = file
+    previewUrl.value = URL.createObjectURL(file)
   }
 }
 
-const publishMenu = () => {
-  if (!namaMenu.value || !nutrisi.value || !fotoBase64.value) {
-    alert('Harap isi Nama Menu, Detail Nutrisi, dan Upload Foto!')
+const publishMenu = async () => {
+  if (!namaMenu.value || !nutrisi.value || !fileGambar.value) {
+    alert('Harap isi Nama Menu, Detail Nutrisi, dan Pilih Foto Editan!')
     return
   }
 
-  const menuData = {
-    nama: namaMenu.value,
-    nutrisi: nutrisi.value,
-    image: fotoBase64.value
+  isLoading.value = true
+
+  try {
+    // 1. Upload foto editan ke Supabase Storage
+    const fileName = `${Date.now()}_${fileGambar.value.name}`
+    const { error: uploadError } = await supabase.storage
+      .from('menu-images')
+      .upload(fileName, fileGambar.value)
+
+    if (uploadError) throw uploadError
+
+    // 2. Ambil URL publik foto tersebut
+    const { data: publicUrlData } = supabase.storage
+      .from('menu-images')
+      .getPublicUrl(fileName)
+
+    const imageUrl = publicUrlData.publicUrl
+
+    // 3. Simpan data baru ke tabel database Supabase
+    const { error: dbError } = await supabase
+      .from('menu')
+      .insert([{ 
+        nama: namaMenu.value, 
+        nutrisi: nutrisi.value, 
+        image_url: imageUrl 
+      }])
+
+    if (dbError) throw dbError
+
+    alert('⚡ Berhasil! Menu & QR Code otomatis terupdate untuk semua siswa secara real-time.')
+    
+    // Admin TETAP DI HALAMAN INI (tidak dipindah paksa ke halaman siswa)
+    namaMenu.value = ''
+    nutrisi.value = ''
+    fileGambar.value = null
+    previewUrl.value = ''
+  } catch (err: any) {
+    alert('Gagal mempublish menu: ' + err.message)
+  } finally {
+    isLoading.value = false
   }
-
-  localStorage.setItem('mbg_menu', JSON.stringify(menuData))
-  
-  // Buat URL parameter agar link portal siswa langsung membawa data lengkap
-  const params = new URLSearchParams({
-    m: namaMenu.value,
-    u: nutrisi.value,
-    i: fotoBase64.value
-  })
-
-  alert('⚡ Menu & Foto Berhasil Dipublish!')
-  router.push(`/siswa?${params.toString()}`)
 }
 
-const resetMenu = () => {
-  if (confirm('Yakin ingin mengosongkan menu?')) {
-    localStorage.removeItem('mbg_menu')
-    alert('Menu dikosongkan.')
-    router.push('/siswa')
+const resetMenu = async () => {
+  if (confirm('Yakin ingin mengosongkan menu hari ini?')) {
+    try {
+      await supabase.from('menu').delete().neq('id', 0)
+      alert('Menu berhasil dikosongkan.')
+    } catch (e: any) {
+      alert('Gagal: ' + e.message)
+    }
   }
 }
 </script>
@@ -86,10 +85,10 @@ const resetMenu = () => {
       <div class="flex justify-between items-center pb-4 border-b border-slate-800">
         <div>
           <h1 class="text-xl font-bold text-emerald-400">ADMIN PORTAL MBG</h1>
-          <p class="text-xs text-slate-400">Input Menu & Upload Foto Sendiri</p>
+          <p class="text-xs text-slate-400">Input Menu & Foto (Sinkron Cloud Real-Time)</p>
         </div>
-        <router-link to="/siswa" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs px-3 py-1.5 rounded-xl font-semibold transition">
-          Lihat Portal Siswa ➔
+        <router-link to="/siswa" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs px-3 py-1.5 rounded-xl font-semibold transition">
+          Buka Layar Siswa ➔
         </router-link>
       </div>
 
@@ -99,7 +98,7 @@ const resetMenu = () => {
           <input 
             v-model="namaMenu" 
             type="text" 
-            placeholder="Contoh: Ayam Bakar" 
+            placeholder="Contoh: Ayam Utey" 
             class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition" 
           />
         </div>
@@ -124,19 +123,20 @@ const resetMenu = () => {
           />
         </div>
 
-        <div v-if="fotoBase64" class="space-y-1">
+        <div v-if="previewUrl" class="space-y-1">
           <p class="text-xs text-slate-400">Preview Foto:</p>
           <div class="h-32 w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
-            <img :src="fotoBase64" alt="Preview" class="w-full h-full object-cover" />
+            <img :src="previewUrl" alt="Preview" class="w-full h-full object-cover" />
           </div>
         </div>
 
         <div class="flex gap-3">
           <button 
             @click="publishMenu" 
-            class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow-lg shadow-emerald-500/10 cursor-pointer"
+            :disabled="isLoading"
+            class="flex-1 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-700 text-slate-950 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow-lg shadow-emerald-500/10 cursor-pointer"
           >
-            <span>⚡</span> PUBLISH & MUNCULKAN QR
+            <span>⚡</span> {{ isLoading ? 'MENYIMPAN...' : 'PUBLISH MENU' }}
           </button>
           <button 
             @click="resetMenu" 
