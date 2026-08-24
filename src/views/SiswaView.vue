@@ -13,16 +13,19 @@ const loadMenuData = () => {
 
   const savedData = localStorage.getItem('mbg_menu')
   if (savedData) {
-    const data = JSON.parse(savedData)
-    if (data && data.nama) {
-      hasMenu.value = true
-      namaMenu.value = data.nama
-      qrValue.value = `${window.location.origin}/detail?m=${encodeURIComponent(data.nama)}`
-      return
+    try {
+      const data = JSON.parse(savedData)
+      if (data && data.nama) {
+        hasMenu.value = true
+        namaMenu.value = data.nama
+        qrValue.value = `${window.location.origin}/detail?m=${encodeURIComponent(data.nama)}`
+        return
+      }
+    } catch (e) {
+      console.error(e)
     }
   }
 
-  // Jika admin belum upload sama sekali
   hasMenu.value = false
   namaMenu.value = 'Belum Ada Menu'
   qrValue.value = ''
@@ -30,7 +33,6 @@ const loadMenuData = () => {
 
 onMounted(() => {
   loadMenuData()
-  window.addEventListener('storage', loadMenuData)
 })
 </script>
 
@@ -43,16 +45,14 @@ onMounted(() => {
         <p class="text-[11px] text-slate-400">Makan Bergizi Gratis - SMAN/SMK</p>
       </div>
 
-      <!-- KONDISI: Jika admin BELUM upload, QR code tidak muncul -->
       <div v-if="!hasMenu" class="bg-slate-950 p-8 rounded-xl border border-slate-800 space-y-3">
         <div class="text-3xl">⏳</div>
         <p class="text-sm font-semibold text-amber-400">Admin Belum Mempublish Menu</p>
         <p class="text-xs text-slate-400 leading-relaxed">
-          QR Code dan informasi menu makanan hari ini akan otomatis muncul setelah admin selesai mengupload foto dan rincian menu.
+          QR Code dan informasi menu makanan akan otomatis muncul setelah admin mengupload foto dan rincian menu.
         </p>
       </div>
 
-      <!-- KONDISI: Jika admin SUDAH upload, QR code MUNCUL -->
       <div v-else class="space-y-4">
         <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 flex justify-center items-center">
           <div class="bg-white p-3 rounded-xl shadow-lg inline-block">
@@ -67,7 +67,7 @@ onMounted(() => {
         </div>
 
         <p class="text-xs text-slate-500 italic">
-          📱 Scan QR Code di atas menggunakan HP siswa untuk melihat detail foto editan & nutrisi gizi makanan.
+          📱 Scan QR Code di atas menggunakan HP siswa untuk melihat detail foto & nutrisi gizi makanan.
         </p>
       </div>
 
