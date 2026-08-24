@@ -12,16 +12,22 @@ const fetchLatestMenu = async () => {
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   tanggal.value = new Date().toLocaleDateString('id-ID', options)
 
-  // Ambil data paling akhir berdasarkan waktu input
+  // Ambil data paling atas secara langsung tanpa filter ketat
   const { data, error } = await supabase
     .from('menu')
     .select('*')
-    .order('id', { ascending: false })
-    .limit(1)
+
+  if (error) {
+    console.error('Error fetching menu:', error.message)
+    hasMenu.value = false
+    return
+  }
 
   if (data && data.length > 0) {
+    // Ambil data terakhir yang di-input
+    const latest = data[data.length - 1]
     hasMenu.value = true
-    namaMenu.value = data[0].nama
+    namaMenu.value = latest.nama
     qrValue.value = `${window.location.origin}/detail`
   } else {
     hasMenu.value = false
