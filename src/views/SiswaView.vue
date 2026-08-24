@@ -18,14 +18,8 @@ const loadMenuData = () => {
       if (data && data.nama) {
         hasMenu.value = true
         namaMenu.value = data.nama
-        
-        // Bungkus data lengkap (nama, nutrisi, foto base64) ke dalam URL QR code
-        const payload = encodeURIComponent(JSON.stringify({
-          n: data.nama,
-          u: data.nutrisi,
-          i: data.image
-        }))
-        qrValue.value = `${window.location.origin}/detail?payload=${payload}`
+        // Gunakan parameter pendek agar QR code berukuran normal dan tidak rusak
+        qrValue.value = `${window.location.origin}/detail?m=${encodeURIComponent(data.nama)}`
         return
       }
     } catch (e) {

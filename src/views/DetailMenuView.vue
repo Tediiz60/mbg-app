@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
 
-const route = useRoute()
 const menu = ref({
   nama: 'Memuat Menu...',
   nutrisi: 'Memuat kandungan gizi...',
@@ -14,37 +12,26 @@ onMounted(() => {
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   tanggal.value = new Date().toLocaleDateString('id-ID', options)
 
-  // Baca data yang dibawa langsung oleh QR Code
-  const payload = route.query.payload as string
-  if (payload) {
+  // Ambil data langsung dari localStorage (sinkron dengan admin)
+  const savedData = localStorage.getItem('mbg_menu')
+  if (savedData) {
     try {
-      const decoded = JSON.parse(decodeURIComponent(payload))
+      const data = JSON.parse(savedData)
       menu.value = {
-        nama: decoded.n || 'Menu Hari Ini',
-        nutrisi: decoded.u || 'Informasi gizi belum tersedia.',
-        image: decoded.i || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
+        nama: data.nama || 'Menu Hari Ini',
+        nutrisi: data.nutrisi || 'Informasi gizi belum tersedia.',
+        image: data.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
       }
       return
     } catch (e) {
-      console.error('Gagal membaca payload QR')
+      console.error(e)
     }
   }
 
-  // Fallback jika dibuka manual di device yang sama
-  const savedData = localStorage.getItem('mbg_menu')
-  if (savedData) {
-    const data = JSON.parse(savedData)
-    menu.value = {
-      nama: data.nama || 'Menu Hari Ini',
-      nutrisi: data.nutrisi || 'Informasi gizi belum tersedia.',
-      image: data.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
-    }
-  } else {
-    menu.value = {
-      nama: 'Belum Ada Menu',
-      nutrisi: 'Admin belum mempublish menu makanan hari ini.',
-      image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
-    }
+  menu.value = {
+    nama: 'Belum Ada Menu',
+    nutrisi: 'Admin belum mempublish menu makanan hari ini.',
+    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
   }
 })
 </script>
