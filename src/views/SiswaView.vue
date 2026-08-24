@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import QrGenerator from '../components/QrGenerator.vue'
 import { supabase } from '../lib/supabase'
+import logoBgn from '@/assets/logo-bgn.png'
 
 const qrValue = ref('')
 const hasMenu = ref(false)
@@ -12,7 +13,6 @@ const fetchLatestMenu = async () => {
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   tanggal.value = new Date().toLocaleDateString('id-ID', options)
 
-  // Ambil data paling atas secara langsung tanpa filter ketat
   const { data, error } = await supabase
     .from('menu')
     .select('*')
@@ -24,7 +24,6 @@ const fetchLatestMenu = async () => {
   }
 
   if (data && data.length > 0) {
-    // Ambil data terakhir yang di-input
     const latest = data[data.length - 1]
     hasMenu.value = true
     namaMenu.value = latest.nama
@@ -45,9 +44,13 @@ onMounted(() => {
   <div class="min-h-screen bg-slate-950 text-white p-4 flex justify-center items-center">
     <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-center space-y-6">
       
-      <div class="text-left pb-3 border-b border-slate-800">
-        <h1 class="text-xl font-extrabold text-cyan-400">SCAN MENU MBG</h1>
-        <p class="text-[11px] text-slate-400">Makan Bergizi Gratis - SMAN/SMK</p>
+      <!-- Header SPPG -->
+      <div class="flex items-center space-x-3 pb-3 border-b border-slate-800 text-left">
+        <img :src="logoBgn" alt="Logo SPPG" class="w-11 h-11 object-contain" />
+        <div>
+          <h1 class="text-lg font-extrabold text-cyan-400">SPPG SLEMAN TIMUR</h1>
+          <p class="text-[10px] text-slate-400">Badan Gizi Nasional - Republik Indonesia</p>
+        </div>
       </div>
 
       <div v-if="!hasMenu" class="bg-slate-950 p-8 rounded-xl border border-slate-800 space-y-3">

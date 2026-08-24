@@ -1,146 +1,141 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { supabase } from '../lib/supabase'
+import logoBgn from '@/assets/logo-bgn.png'
 
 const namaMenu = ref('')
-const nutrisi = ref('')
-const fileGambar = ref<File | null>(null)
+const nutrisiValue = ref('')
+const fileInput = ref<HTMLInputElement | null>(null)
 const previewUrl = ref('')
-const isLoading = ref(false)
+const isUploading = ref(false)
 
-const handleFileUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement
+const handleFileChange = (e: Event) => {
+  const target = e.target as HTMLInputElement
   if (target.files && target.files[0]) {
     const file = target.files[0]
-    fileGambar.value = file
     previewUrl.value = URL.createObjectURL(file)
   }
 }
 
-const publishMenu = async () => {
-  if (!namaMenu.value || !nutrisi.value || !fileGambar.value) {
-    alert('Harap isi Nama Menu, Detail Nutrisi, dan Pilih Foto Editan!')
+const handlePublish = async () => {
+  if (!fileInput.value?.files?.[0] || !namaMenu.value || !nutrisiValue.value) {
+    alert('Mohon isi nama menu, rincian gizi, dan pilih foto terlebih dahulu!')
     return
   }
 
-  isLoading.value = true
+  isUploading.value = true
+  const file = fileInput.value.files[0]
+  const fileName = `${Date.now()}-${file.name}`
 
-  try {
-    // 1. Upload foto editan ke Supabase Storage
-    const fileName = `${Date.now()}_${fileGambar.value.name}`
-    const { error: uploadError } = await supabase.storage
-      .from('menu-images')
-      .upload(fileName, fileGambar.value)
+  // 1. Upload foto ke Supabase Storage
+  const { error: uploadError } = await supabase.storage
+    .from('menu-images')
+    .upload(fileName, file)
 
-    if (uploadError) throw uploadError
+  if (uploadError) {
+    alert('Gagal upload foto: ' + uploadError.message)
+    isUploading.value = false
+    return
+  }
 
-    // 2. Ambil URL publik foto tersebut
-    const { data: publicUrlData } = supabase.storage
-      .from('menu-images')
-      .getPublicUrl(fileName)
+  // 2. Ambil Public URL foto
+  const { data: publicUrlData } = supabase.storage
+    .from('menu-images')
+    .getPublicUrl(fileName)
 
-    const imageUrl = publicUrlData.publicUrl
+  // 3. Masukkan data ke tabel menu
+  const { error: insertError } = await supabase
+    .from('menu')
+    .insert([
+      {
+        nama: namaMenu.value,
+        nutrisi: nutrisiValue.value,
+        image_url: publicUrlData.publicUrl
+      }
+    ])
 
-    // 3. Simpan data baru ke tabel database Supabase
-    const { error: dbError } = await supabase
-      .from('menu')
-      .insert([{ 
-        nama: namaMenu.value, 
-        nutrisi: nutrisi.value, 
-        image_url: imageUrl 
-      }])
+  isUploading.value = false
 
-    if (dbError) throw dbError
-
-    alert('⚡ Berhasil! Menu & QR Code otomatis terupdate untuk semua siswa secara real-time.')
-    
-    // Admin TETAP DI HALAMAN INI (tidak dipindah paksa ke halaman siswa)
+  if (insertError) {
+    alert('Gagal mempublish menu: ' + insertError.message)
+  } else {
+    alert('Berhasil! Menu & QR Code otomatis terupdate untuk semua siswa secara real-time.')
     namaMenu.value = ''
-    nutrisi.value = ''
-    fileGambar.value = null
+    nutrisiValue.value = ''
     previewUrl.value = ''
-  } catch (err: any) {
-    alert('Gagal mempublish menu: ' + err.message)
-  } finally {
-    isLoading.value = false
+    if (fileInput.value) fileInput.value.value = ''
   }
 }
 
-const resetMenu = async () => {
-  if (confirm('Yakin ingin mengosongkan menu hari ini?')) {
-    try {
-      await supabase.from('menu').delete().neq('id', 0)
-      alert('Menu berhasil dikosongkan.')
-    } catch (e: any) {
-      alert('Gagal: ' + e.message)
-    }
-  }
+const handleClear = () => {
+  namaMenu.value = ''
+  nutrisiValue.value = ''
+  previewUrl.value = ''
+  if (fileInput.value) fileInput.value.value = ''
 }
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-950 text-white p-4 md:p-6 flex justify-center items-center">
-    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-5">
+  <div class="min-h-screen bg-slate-950 text-white p-4 flex justify-center items-center">
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-6">
       
-      <div class="flex justify-between items-center pb-4 border-b border-slate-800">
+      <!-- Header SPPG Admin -->
+      <div class="flex items-center space-x-3 pb-3 border-b border-slate-800">
+        <img :src="logoBgn" alt="Logo SPPG" class="w-11 h-11 object-contain" />
         <div>
-          <h1 class="text-xl font-bold text-emerald-400">ADMIN PORTAL MBG</h1>
-          <p class="text-xs text-slate-400">Input Menu & Foto (Sinkron Cloud Real-Time)</p>
+          <h1 class="text-lg font-extrabold text-cyan-400">ADMIN PORTAL SPPG</h1>
+          <p class="text-[10px] text-slate-400">Input Menu & Foto (Sinkron Cloud Real-Time)</p>
         </div>
-        <router-link to="/siswa" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs px-3 py-1.5 rounded-xl font-semibold transition">
-          Buka Layar Siswa ➔
-        </router-link>
       </div>
 
       <div class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Nama Menu Makanan</label>
+          <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Nama Menu Makanan</label>
           <input 
             v-model="namaMenu" 
             type="text" 
-            placeholder="Contoh: Ayam Utey" 
-            class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition" 
+            placeholder="Contoh: Nasi Ayam Berkizi..." 
+            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500"
           />
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Detail Nutrisi & Gizi</label>
+          <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Detail Nutrisi & Gizi</label>
           <textarea 
-            v-model="nutrisi" 
+            v-model="nutrisiValue" 
             rows="3" 
-            placeholder="Contoh: Kalori: 450 kcal..." 
-            class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition"
+            placeholder="Contoh: Kalori: 450 kcal, Protein: 25g..." 
+            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500"
           ></textarea>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Upload Foto Hasil Editan</label>
+          <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Upload Foto Hasil Editan</label>
           <input 
+            ref="fileInput" 
             type="file" 
             accept="image/*" 
-            @change="handleFileUpload" 
-            class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-slate-800 file:text-emerald-400 hover:file:bg-slate-700 cursor-pointer border border-slate-800 rounded-xl p-1"
+            @change="handleFileChange" 
+            class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500 file:text-slate-950 hover:file:bg-cyan-400 cursor-pointer"
           />
         </div>
 
         <div v-if="previewUrl" class="space-y-1">
           <p class="text-xs text-slate-400">Preview Foto:</p>
-          <div class="h-32 w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
-            <img :src="previewUrl" alt="Preview" class="w-full h-full object-cover" />
-          </div>
+          <img :src="previewUrl" alt="Preview" class="w-full h-48 object-cover rounded-xl border border-slate-800" />
         </div>
 
-        <div class="flex gap-3">
+        <div class="flex space-x-3 pt-2">
           <button 
-            @click="publishMenu" 
-            :disabled="isLoading"
-            class="flex-1 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-700 text-slate-950 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow-lg shadow-emerald-500/10 cursor-pointer"
+            @click="handlePublish" 
+            :disabled="isUploading"
+            class="flex-1 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-2.5 rounded-xl transition duration-200 text-sm disabled:opacity-50"
           >
-            <span>⚡</span> {{ isLoading ? 'MENYIMPAN...' : 'PUBLISH MENU' }}
+            {{ isUploading ? 'MENYIMPAN...' : '⚡ PUBLISH MENU' }}
           </button>
           <button 
-            @click="resetMenu" 
-            class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 font-semibold px-4 py-3 rounded-xl transition text-xs cursor-pointer"
+            @click="handleClear" 
+            class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-2.5 rounded-xl transition duration-200 text-sm"
           >
             Kosongkan
           </button>
