@@ -8,13 +8,12 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex justify-center items-center">
+  <div class="flex justify-center items-center bg-white p-2 rounded-xl shadow">
     <QrcodeVue 
       :value="value" 
-      :size="size || 200" 
-      level="M" 
-      render-as="svg" 
-      class="max-w-full h-auto rounded-lg"
+      :size="size || 180" 
+      level="H"
+      render-as="svg"
     />
   </div>
 </template>
