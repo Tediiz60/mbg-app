@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const menu = ref({
   nama: 'Memuat Menu...',
   nutrisi: 'Memuat kandungan gizi...',
@@ -12,6 +14,23 @@ onMounted(() => {
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   tanggal.value = new Date().toLocaleDateString('id-ID', options)
 
+  // Cek apakah data dikirim lewat parameter QR Code
+  const dataParam = route.query.data as string
+  if (dataParam) {
+    try {
+      const parsed = JSON.parse(decodeURIComponent(dataParam))
+      menu.value = {
+        nama: parsed.nama || 'Menu Hari Ini',
+        nutrisi: parsed.nutrisi || 'Informasi gizi belum tersedia.',
+        image: parsed.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
+      }
+      return
+    } catch (e) {
+      console.error('Gagal memparsing data QR')
+    }
+  }
+
+  // Fallback jika dibuka manual
   const savedData = localStorage.getItem('mbg_menu')
   if (savedData) {
     const data = JSON.parse(savedData)
@@ -23,7 +42,7 @@ onMounted(() => {
   } else {
     menu.value = {
       nama: 'Belum Ada Menu',
-      nutrisi: 'Admin belum mempublish menu makanan hari ini.',
+      nutrisi: 'Admin belum mempublish menu makanan.',
       image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
     }
   }

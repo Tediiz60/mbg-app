@@ -13,14 +13,14 @@ const handleFileUpload = (event: Event) => {
     const file = target.files[0]
     const reader = new FileReader()
     reader.onload = (e) => {
-      // Kompres / resize gambar otomatis agar ukuran base64 kecil & QR tidak meledak
+      // Kompres gambar otomatis agar ukuran base64 kecil & pas discan HP
       const img = new Image()
       img.src = e.target?.result as string
       img.onload = () => {
         const canvas = document.createElement('canvas')
         const ctx = canvas.getContext('2d')
-        const MAX_WIDTH = 400
-        const MAX_HEIGHT = 400
+        const MAX_WIDTH = 300
+        const MAX_HEIGHT = 300
         let width = img.width
         let height = img.height
 
@@ -39,7 +39,7 @@ const handleFileUpload = (event: Event) => {
         canvas.width = width
         canvas.height = height
         ctx?.drawImage(img, 0, 0, width, height)
-        fotoBase64.value = canvas.toDataURL('image/jpeg', 0.7)
+        fotoBase64.value = canvas.toDataURL('image/jpeg', 0.6)
       }
     }
     reader.readAsDataURL(file)
@@ -56,12 +56,12 @@ const publishMenu = () => {
     nama: namaMenu.value,
     nutrisi: nutrisi.value,
     image: fotoBase64.value || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c',
-    timestamp: Date.now() // Penanda waktu agar selalu fresh
+    timestamp: Date.now()
   }
 
-  // Simpan ke localStorage agar langsung terbaca real-time oleh halaman siswa
+  // Simpan ke localStorage
   localStorage.setItem('mbg_menu', JSON.stringify(menuData))
-  alert('⚡ Menu berhasil dipublish! Silakan cek halaman Siswa.')
+  alert('⚡ Menu berhasil dipublish untuk hari ini/besok!')
   router.push('/siswa')
 }
 </script>
@@ -96,7 +96,7 @@ const publishMenu = () => {
           <textarea 
             v-model="nutrisi" 
             rows="3" 
-            placeholder="Contoh: Kalori: 400 kcal, Protein: 28g, Karbohidrat: 45g..." 
+            placeholder="Contoh: Kalori: 400 kcal, Protein: 28g..." 
             class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition"
           ></textarea>
         </div>

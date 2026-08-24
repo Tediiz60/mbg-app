@@ -15,11 +15,9 @@ const loadMenuData = () => {
     const data = JSON.parse(savedData)
     namaMenu.value = data.nama || 'Menu Baru'
     
-    // QR code diarahkan ke halaman detail dengan membawa parameter data unik agar fresh
-    const params = new URLSearchParams({
-      t: data.timestamp || Date.now().toString()
-    })
-    qrValue.value = `${window.location.origin}/detail?${params.toString()}`
+    // Encode data menu ke dalam URL parameter agar HP siswa langsung bisa membacanya tanpa database
+    const compressedData = encodeURIComponent(JSON.stringify(data))
+    qrValue.value = `${window.location.origin}/detail?data=${compressedData}`
   } else {
     qrValue.value = `${window.location.origin}/detail`
   }
@@ -27,7 +25,6 @@ const loadMenuData = () => {
 
 onMounted(() => {
   loadMenuData()
-  // Deteksi perubahan data secara real-time dari tab admin
   window.addEventListener('storage', loadMenuData)
 })
 </script>
@@ -53,13 +50,13 @@ onMounted(() => {
       </div>
 
       <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-1">
-        <p class="text-xs font-semibold text-slate-400 uppercase">Menu Makanan Hari Ini</p>
+        <p class="text-xs font-semibold text-slate-400 uppercase">Menu Makanan Terbaru</p>
         <p class="text-lg font-bold text-cyan-400 capitalize">{{ namaMenu }}</p>
         <p class="text-xs text-slate-500">{{ tanggal }}</p>
       </div>
 
       <p class="text-xs text-slate-500 italic">
-        📱 Scan QR Code di atas menggunakan kamera HP siswa untuk melihat detail foto & nutrisi gizi makanan.
+        📱 Scan QR Code di atas menggunakan HP siswa untuk melihat detail foto & nutrisi gizi makanan hari ini/besok.
       </p>
 
     </div>
