@@ -60,10 +60,8 @@ const handlePublish = async () => {
     alert('Gagal mempublish menu: ' + insertError.message)
   } else {
     alert('Berhasil! Menu & QR Code otomatis terupdate untuk semua siswa secara real-time.')
-    namaMenu.value = ''
-    nutrisiValue.value = ''
-    previewUrl.value = ''
-    if (fileInput.value) fileInput.value.value = ''
+    // Bersihkan form setelah berhasil
+    handleClear()
   }
 }
 
@@ -71,7 +69,9 @@ const handleClear = () => {
   namaMenu.value = ''
   nutrisiValue.value = ''
   previewUrl.value = ''
-  if (fileInput.value) fileInput.value.value = ''
+  if (fileInput.value) {
+    fileInput.value.value = '' // Ini yang membuat tombol file "Pilih File" kembali kosong
+  }
 }
 </script>
 
