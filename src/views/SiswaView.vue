@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import QrGenerator from '../components/QrGenerator.vue'
 
+const route = useRoute()
 const qrValue = ref('')
 const hasMenu = ref(false)
 const namaMenu = ref('Belum Ada Menu')
@@ -11,6 +13,25 @@ const loadMenuData = () => {
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   tanggal.value = new Date().toLocaleDateString('id-ID', options)
 
+  // Cek apakah ada data menu yang dibawa dari parameter URL (agar HP dan laptop sinkron real-time)
+  const queryMenu = route.query.m as string
+  const queryNutrisi = route.query.u as string
+  const queryImage = route.query.i as string
+
+  if (queryMenu) {
+    hasMenu.value = true
+    namaMenu.value = queryMenu
+    // Simpan ke localStorage perangkat ini juga
+    localStorage.setItem('mbg_menu', JSON.stringify({
+      nama: queryMenu,
+      nutrisi: queryNutrisi || '',
+      image: queryImage || ''
+    }))
+    qrValue.value = window.location.href
+    return
+  }
+
+  // Jika tidak ada di URL, cek localStorage
   const savedData = localStorage.getItem('mbg_menu')
   if (savedData) {
     try {
@@ -19,18 +40,16 @@ const loadMenuData = () => {
         hasMenu.value = true
         namaMenu.value = data.nama
         
-        // Bungkus data lengkap ke dalam QR code agar HP langsung membaca foto & menu baru
-        const payload = encodeURIComponent(JSON.stringify({
-          n: data.nama,
-          u: data.nutrisi,
-          i: data.image
-        }))
-        qrValue.value = `${window.location.origin}/detail?payload=${payload}`
+        // Buat link URL lengkap agar HP yang scan langsung sinkron datanya
+        const params = new URLSearchParams({
+          m: data.nama,
+          u: data.nutrisi || '',
+          i: data.image || ''
+        })
+        qrValue.value = `${window.location.origin}/siswa?${params.toString()}`
         return
       }
-    } catch (e) {
-      console.error(e)
-    }
+    } catch (e) {}
   }
 
   hasMenu.value = false
@@ -62,9 +81,7 @@ onMounted(() => {
 
       <div v-else class="space-y-4">
         <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 flex justify-center items-center">
-          <div class="bg-white p-3 rounded-xl shadow-lg inline-block">
-            <QrGenerator :value="qrValue" :size="180" />
-          </div>
+          <QrGenerator :value="qrValue" :size="180" />
         </div>
 
         <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-1">
