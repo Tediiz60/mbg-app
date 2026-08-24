@@ -1,94 +1,95 @@
-<template>
-  <div class="max-w-xl mx-auto p-6 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl text-white my-8">
-    <div class="flex items-center justify-between mb-6 border-b border-slate-700 pb-3">
-      <h3 class="text-base font-bold text-emerald-400 uppercase tracking-wider">Admin - Input & Publish Menu MBG</h3>
-      <span class="bg-emerald-500/20 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full">Admin Portal</span>
-    </div>
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
 
-    <form @submit.prevent="publishMenu" class="space-y-4 text-left">
+const namaMenu = ref('')
+const nutrisi = ref('')
+const fotoBase64 = ref('')
+
+onMounted(() => {
+  const savedData = localStorage.getItem('mbg_menu')
+  if (savedData) {
+    const data = JSON.parse(savedData)
+    namaMenu.value = data.nama || ''
+    nutrisi.value = data.nutrisi || ''
+    fotoBase64.value = data.image || ''
+  }
+})
+
+const handleFileUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    const file = target.files[0]
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      fotoBase64.value = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+const publishMenu = () => {
+  if (!namaMenu.value || !nutrisi.value) {
+    alert('Harap isi Nama Menu dan Detail Nutrisi!')
+    return
+  }
+
+  const menuData = {
+    nama: namaMenu.value,
+    nutrisi: nutrisi.value,
+    image: fotoBase64.value || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
+  }
+
+  localStorage.setItem('mbg_menu', JSON.stringify(menuData))
+  alert('Menu berhasil dipublish!')
+}
+</script>
+
+<template>
+  <div class="min-h-screen bg-slate-900 text-white p-6 max-w-2xl mx-auto">
+    <h1 class="text-2xl font-bold mb-6 text-emerald-400">ADMIN - INPUT & PUBLISH MENU MBG</h1>
+
+    <div class="space-y-4 bg-slate-800 p-6 rounded-xl border border-slate-700">
       <div>
-        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Nama Menu Makanan</label>
+        <label class="block text-sm font-semibold mb-2">NAMA MENU MAKANAN</label>
         <input 
-          v-model="form.title" 
+          v-model="namaMenu" 
           type="text" 
-          placeholder="Contoh: Ayam Goreng + Nasi" 
-          class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500"
-          required
+          placeholder="Masukkan nama menu..." 
+          class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-emerald-500" 
         />
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Detail Nutrisi & Gizi</label>
+        <label class="block text-sm font-semibold mb-2">DETAIL NUTRISI & GIZI</label>
         <textarea 
-          v-model="form.info" 
+          v-model="nutrisi" 
           rows="3" 
-          placeholder="Contoh: Karbohidrat 45g, Protein 25g..." 
-          class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500"
-          required
+          placeholder="Masukkan detail gizi..." 
+          class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-emerald-500"
         ></textarea>
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Upload Foto Menu Makanan</label>
+        <label class="block text-sm font-semibold mb-2">UPLOAD FOTO MENU MAKANAN</label>
         <input 
           type="file" 
           accept="image/*" 
           @change="handleFileUpload" 
-          class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-500 file:text-slate-900 hover:file:bg-emerald-400 cursor-pointer"
+          class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer"
         />
       </div>
 
-      <div v-if="form.img" class="mt-2">
-        <p class="text-xs text-slate-400 mb-1">Preview Foto Menu:</p>
-        <img :src="form.img" class="w-full h-40 object-cover rounded-xl border border-slate-700" />
+      <div v-if="fotoBase64" class="mt-4">
+        <p class="text-xs text-slate-400 mb-2">Preview Foto Menu:</p>
+        <img :src="fotoBase64" alt="Preview" class="w-full h-48 object-cover rounded-lg border border-slate-700" />
       </div>
 
       <button 
-        type="submit" 
-        class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 px-4 rounded-xl shadow-lg transition-all text-sm mt-4 uppercase tracking-wider"
+        @click="publishMenu" 
+        class="w-full mt-4 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-lg transition"
       >
-        🚀 Publish Menu & Kirim ke Siswa
+        Publish Menu
       </button>
-    </form>
+    </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue';
-
-const form = ref({
-  title: '',
-  info: '',
-  img: ''
-});
-
-const handleFileUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  if (target.files && target.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      form.value.img = e.target?.result as string;
-    };
-    reader.readAsDataURL(target.files[0]);
-  }
-};
-
-const publishMenu = () => {
-  const now = new Date();
-  const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  const dateStr = now.toLocaleDateString('id-ID', options);
-
-  const menuData = {
-    title: form.value.title,
-    info: form.value.info,
-    img: form.value.img,
-    date: dateStr
-  };
-
-  localStorage.setItem('mbg_current_menu', JSON.stringify(menuData));
-  
-  // Broadcast ke tab lain
-  window.dispatchEvent(new Event('mbg-menu-updated'));
-  alert('Menu berhasil di-publish!');
-};
-</script>
