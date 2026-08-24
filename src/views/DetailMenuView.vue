@@ -14,6 +14,7 @@ onMounted(() => {
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   tanggal.value = new Date().toLocaleDateString('id-ID', options)
 
+  // Baca data yang dibawa langsung oleh QR Code
   const payload = route.query.payload as string
   if (payload) {
     try {
@@ -25,11 +26,11 @@ onMounted(() => {
       }
       return
     } catch (e) {
-      console.error('Gagal membaca payload')
+      console.error('Gagal membaca payload QR')
     }
   }
 
-  // Fallback ke localStorage jika dibuka di device yang sama
+  // Fallback jika dibuka manual di device yang sama
   const savedData = localStorage.getItem('mbg_menu')
   if (savedData) {
     const data = JSON.parse(savedData)
@@ -60,7 +61,7 @@ onMounted(() => {
         <p class="text-xs text-slate-400">{{ tanggal }}</p>
       </div>
 
-      <div class="overflow-hidden rounded-xl border border-slate-800 h-48 bg-slate-950 shadow-inner">
+      <div class="overflow-hidden rounded-xl border border-slate-800 h-48 bg-slate-950 shadow-inner flex justify-center items-center">
         <img :src="menu.image" alt="Foto Makanan" class="w-full h-full object-cover" />
       </div>
 
