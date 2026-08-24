@@ -18,9 +18,8 @@ const handleFileUpload = (event: Event) => {
       img.onload = () => {
         const canvas = document.createElement('canvas')
         const ctx = canvas.getContext('2d')
-        // Perkecil ukuran pixel gambar agar muat sempurna di dalam QR Code
-        const MAX_WIDTH = 150
-        const MAX_HEIGHT = 150
+        const MAX_WIDTH = 300
+        const MAX_HEIGHT = 300
         let width = img.width
         let height = img.height
 
@@ -39,8 +38,7 @@ const handleFileUpload = (event: Event) => {
         canvas.width = width
         canvas.height = height
         ctx?.drawImage(img, 0, 0, width, height)
-        // Kualitas 0.4 agar ukuran string Base64 kecil dan ringan discan
-        fotoBase64.value = canvas.toDataURL('image/jpeg', 0.4)
+        fotoBase64.value = canvas.toDataURL('image/jpeg', 0.6)
       }
     }
     reader.readAsDataURL(file)
@@ -60,14 +58,23 @@ const publishMenu = () => {
   }
 
   localStorage.setItem('mbg_menu', JSON.stringify(menuData))
+  
+  // Buat URL parameter agar link portal siswa langsung membawa data lengkap
+  const params = new URLSearchParams({
+    m: namaMenu.value,
+    u: nutrisi.value,
+    i: fotoBase64.value
+  })
+
   alert('⚡ Menu & Foto Berhasil Dipublish!')
-  router.push('/siswa')
+  router.push(`/siswa?${params.toString()}`)
 }
 
 const resetMenu = () => {
   if (confirm('Yakin ingin mengosongkan menu?')) {
     localStorage.removeItem('mbg_menu')
     alert('Menu dikosongkan.')
+    router.push('/siswa')
   }
 }
 </script>
@@ -92,7 +99,7 @@ const resetMenu = () => {
           <input 
             v-model="namaMenu" 
             type="text" 
-            placeholder="Contoh: Ayam Rodi Hytam" 
+            placeholder="Contoh: Ayam Bakar" 
             class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition" 
           />
         </div>
