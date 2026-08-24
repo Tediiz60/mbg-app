@@ -15,13 +15,8 @@ const loadMenuData = () => {
     const data = JSON.parse(savedData)
     namaMenu.value = data.nama || 'Menu Baru'
     
-    // Masukkan data teks ke dalam parameter URL agar langsung terbaca di HP saat discan
-    const queryData = encodeURIComponent(JSON.stringify({
-      n: data.nama,
-      u: data.nutrisi,
-      i: data.image
-    }))
-    qrValue.value = `${window.location.origin}/detail?payload=${queryData}`
+    // Gunakan parameter pendek agar QR code tetap besar, bersih, dan mudah discan HP
+    qrValue.value = `${window.location.origin}/detail?m=${encodeURIComponent(data.nama)}`
   } else {
     qrValue.value = `${window.location.origin}/detail`
   }
@@ -37,12 +32,13 @@ onMounted(() => {
   <div class="min-h-screen bg-slate-950 text-white p-4 flex justify-center items-center">
     <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-center space-y-6">
       
-      <!-- Header bersih tanpa tombol login admin -->
-      <div class="text-left pb-2 border-b border-slate-800">
+      <!-- HEADER BERSIH: Tombol "Admin Login" sudah DIHAPUS total agar aman -->
+      <div class="text-left pb-3 border-b border-slate-800">
         <h1 class="text-xl font-extrabold text-cyan-400">SCAN MENU MBG</h1>
         <p class="text-[11px] text-slate-400">Makan Bergizi Gratis - SMAN/SMK</p>
       </div>
 
+      <!-- KOTAK QR CODE (Normal, besar, dan langsung bisa discan) -->
       <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 flex justify-center items-center">
         <div class="bg-white p-3 rounded-xl shadow-lg inline-block">
           <QrGenerator v-if="qrValue" :value="qrValue" :size="180" />
