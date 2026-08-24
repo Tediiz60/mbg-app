@@ -13,20 +13,16 @@ onMounted(() => {
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   tanggal.value = new Date().toLocaleDateString('id-ID', options)
 
-  // 1. Ambil data langsung dari parameter QR Code
+  // Baca parameter nama & nutrisi dari QR Code
   const urlParams = new URLSearchParams(window.location.search)
   const namaParam = urlParams.get('nama')
   const nutrisiParam = urlParams.get('nutrisi')
-  const imageParam = urlParams.get('image')
 
-  if (namaParam || nutrisiParam || imageParam) {
-    menu.value = {
-      nama: namaParam || menu.value.nama,
-      nutrisi: nutrisiParam || menu.value.nutrisi,
-      image: imageParam || menu.value.image
-    }
+  if (namaParam || nutrisiParam) {
+    menu.value.nama = namaParam || menu.value.nama
+    menu.value.nutrisi = nutrisiParam || menu.value.nutrisi
   } else {
-    // 2. Fallback jika dibuka langsung di laptop admin
+    // Fallback jika diakses dari laptop yang sama
     const savedData = localStorage.getItem('mbg_menu')
     if (savedData) {
       const parsed = JSON.parse(savedData)

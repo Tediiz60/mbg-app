@@ -15,11 +15,10 @@ const updateQrData = () => {
     const data = JSON.parse(savedData)
     namaMenu.value = data.nama || 'Belum Ada Menu'
     
-    // Kirim data nama dan nutrisi lewat URL Query
+    // Hanya kirim teks nama & nutrisi ke QR Code agar ukuran QR tetap normal
     const params = new URLSearchParams({
       nama: data.nama || '',
-      nutrisi: data.nutrisi || '',
-      image: data.image || ''
+      nutrisi: data.nutrisi || ''
     })
     
     qrValue.value = `${window.location.origin}/detail?${params.toString()}`
@@ -30,8 +29,6 @@ const updateQrData = () => {
 
 onMounted(() => {
   updateQrData()
-  
-  // Update otomatis jika admin klik Publish Menu di tab lain
   window.addEventListener('storage', updateQrData)
 })
 </script>
@@ -45,12 +42,12 @@ onMounted(() => {
 
     <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-2xl max-w-md w-full text-center space-y-6">
       <div class="flex justify-between items-center">
-        <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">QR Code Menu Hari Ini</h2>
+        <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">QR CODE MENU HARI INI</h2>
         <span class="bg-cyan-950 text-cyan-400 text-xs px-3 py-1 rounded-full border border-cyan-800">Siswa Portal</span>
       </div>
 
-      <div class="bg-white p-4 rounded-xl flex justify-center items-center shadow-inner">
-        <QrGenerator v-if="qrValue" :value="qrValue" :size="240" />
+      <div class="bg-white p-4 rounded-xl flex justify-center items-center shadow-inner overflow-hidden">
+        <QrGenerator v-if="qrValue" :value="qrValue" :size="200" class="max-w-full h-auto" />
       </div>
 
       <div class="space-y-1">
@@ -59,7 +56,7 @@ onMounted(() => {
       </div>
 
       <p class="text-xs text-slate-500 italic">
-        📱 Scan QR Code di atas menggunakan HP untuk melihat detail gizi & foto.
+        📱 Scan QR Code di atas menggunakan HP untuk melihat detail gizi.
       </p>
     </div>
   </div>
