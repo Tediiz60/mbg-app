@@ -12,16 +12,16 @@ const fetchLatestMenu = async () => {
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   tanggal.value = new Date().toLocaleDateString('id-ID', options)
 
-  const { data } = await supabase
+  // Ambil data paling akhir berdasarkan waktu input
+  const { data, error } = await supabase
     .from('menu')
     .select('*')
-    .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
     .limit(1)
 
   if (data && data.length > 0) {
     hasMenu.value = true
     namaMenu.value = data[0].nama
-    // QR Code mengarah ke halaman detail bersih dari cloud
     qrValue.value = `${window.location.origin}/detail`
   } else {
     hasMenu.value = false
@@ -32,14 +32,6 @@ const fetchLatestMenu = async () => {
 
 onMounted(() => {
   fetchLatestMenu()
-
-  // Real-time listener: otomatis update ke semua perangkat siswa begitu admin publish
-  supabase
-    .channel('public:menu')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'menu' }, () => {
-      fetchLatestMenu()
-    })
-    .subscribe()
 })
 </script>
 
