@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { supabase } from '../lib/supabase'
-import logoBgn from '@/assets/logo-bgn.png'
+import logoBgn from '@/assets/sppg.webp'
 
 const namaMenu = ref('')
 const nutrisiValue = ref('')

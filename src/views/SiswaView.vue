@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import QrGenerator from '../components/QrGenerator.vue'
 import { supabase } from '../lib/supabase'
-import logoBgn from '@/assets/logo-bgn.png'
+import logoBgn from '@/assets/sppg.webp'
 
 const qrValue = ref('')
 const hasMenu = ref(false)
