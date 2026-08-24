@@ -1,54 +1,43 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { supabase } from '../lib/supabase'
 
-const route = useRoute()
 const menu = ref({
-  nama: 'Memuat Menu...',
-  nutrisi: 'Memuat kandungan gizi...',
-  image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
+  nama: 'Memuat data...',
+  nutrisi: 'Memuat detail gizi...',
+  image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
 })
 const tanggal = ref('')
 
-onMounted(() => {
+const fetchDetail = async () => {
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   tanggal.value = new Date().toLocaleDateString('id-ID', options)
 
-  // Ambil data langsung dari payload QR code yang di-scan HP
-  const payload = route.query.payload as string
-  if (payload) {
-    try {
-      const decoded = JSON.parse(decodeURIComponent(payload))
-      menu.value = {
-        nama: decoded.n || 'Menu Hari Ini',
-        nutrisi: decoded.u || 'Informasi gizi belum tersedia.',
-        image: decoded.i || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
-      }
-      return
-    } catch (e) {
-      console.error('Gagal membaca payload')
-    }
-  }
+  // Mengambil data PALING BARU dari database Supabase Cloud
+  const { data, error } = await supabase
+    .from('menu')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(1)
 
-  // Fallback jika dibuka manual
-  const savedData = localStorage.getItem('mbg_menu')
-  if (savedData) {
-    try {
-      const data = JSON.parse(savedData)
-      menu.value = {
-        nama: data.nama || 'Menu Hari Ini',
-        nutrisi: data.nutrisi || 'Informasi gizi belum tersedia.',
-        image: data.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
-      }
-      return
-    } catch (e) {}
+  if (data && data.length > 0) {
+    menu.value = data[0]
+  } else {
+    menu.value.nama = 'Belum Ada Menu'
+    menu.value.nutrisi = 'Admin belum mempublish menu makanan hari ini.'
   }
+}
 
-  menu.value = {
-    nama: 'Belum Ada Menu',
-    nutrisi: 'Admin belum mempublish menu makanan hari ini.',
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
-  }
+onMounted(() => {
+  fetchDetail()
+
+  // Real-time listener: jika admin ganti menu saat siswa sedang buka halaman ini, langsung berubah otomatis!
+  supabase
+    .channel('public:menu-detail')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'menu' }, () => {
+      fetchDetail()
+    })
+    .subscribe()
 })
 </script>
 
@@ -65,7 +54,7 @@ onMounted(() => {
       </div>
 
       <div class="overflow-hidden rounded-xl border border-slate-800 h-48 bg-slate-950 shadow-inner flex justify-center items-center">
-        <img :src="menu.image" alt="Foto Makanan" class="w-full h-full object-cover" />
+        <img :src="menu.image_url" alt="Foto Makanan" class="w-full h-full object-cover" />
       </div>
 
       <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-1">
