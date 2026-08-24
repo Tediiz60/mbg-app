@@ -18,9 +18,9 @@ const handleFileUpload = (event: Event) => {
       img.onload = () => {
         const canvas = document.createElement('canvas')
         const ctx = canvas.getContext('2d')
-        // Kompres ukuran gambar agar pas dan ringan di QR Code
-        const MAX_WIDTH = 250
-        const MAX_HEIGHT = 250
+        // Perkecil ukuran pixel gambar agar muat sempurna di dalam QR Code
+        const MAX_WIDTH = 150
+        const MAX_HEIGHT = 150
         let width = img.width
         let height = img.height
 
@@ -39,7 +39,8 @@ const handleFileUpload = (event: Event) => {
         canvas.width = width
         canvas.height = height
         ctx?.drawImage(img, 0, 0, width, height)
-        fotoBase64.value = canvas.toDataURL('image/jpeg', 0.5)
+        // Kualitas 0.4 agar ukuran string Base64 kecil dan ringan discan
+        fotoBase64.value = canvas.toDataURL('image/jpeg', 0.4)
       }
     }
     reader.readAsDataURL(file)
@@ -48,7 +49,7 @@ const handleFileUpload = (event: Event) => {
 
 const publishMenu = () => {
   if (!namaMenu.value || !nutrisi.value || !fotoBase64.value) {
-    alert('Harap isi Nama Menu, Detail Nutrisi, dan Upload Foto hasil editan terlebih dahulu!')
+    alert('Harap isi Nama Menu, Detail Nutrisi, dan Upload Foto!')
     return
   }
 
@@ -58,16 +59,15 @@ const publishMenu = () => {
     image: fotoBase64.value
   }
 
-  // Simpan ke localStorage agar QR code di siswa langsung muncul
   localStorage.setItem('mbg_menu', JSON.stringify(menuData))
-  alert('⚡ Menu & Foto Berhasil Dipublish! QR Code sekarang aktif di Portal Siswa.')
+  alert('⚡ Menu & Foto Berhasil Dipublish!')
   router.push('/siswa')
 }
 
 const resetMenu = () => {
-  if (confirm('Yakin ingin menghapus menu hari ini? QR Code di siswa akan disembunyikan.')) {
+  if (confirm('Yakin ingin mengosongkan menu?')) {
     localStorage.removeItem('mbg_menu')
-    alert('Menu berhasil dikosongkan.')
+    alert('Menu dikosongkan.')
   }
 }
 </script>
@@ -92,7 +92,7 @@ const resetMenu = () => {
           <input 
             v-model="namaMenu" 
             type="text" 
-            placeholder="Contoh: Ayam Betutu & Sayur Nangka" 
+            placeholder="Contoh: Ayam Rodi Hytam" 
             class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition" 
           />
         </div>
@@ -102,13 +102,13 @@ const resetMenu = () => {
           <textarea 
             v-model="nutrisi" 
             rows="3" 
-            placeholder="Contoh: Kalori: 400 kcal, Protein: 28g..." 
+            placeholder="Contoh: Kalori: 450 kcal..." 
             class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition"
           ></textarea>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Upload Foto Hasil Editan (Dari Komputer)</label>
+          <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Upload Foto Hasil Editan</label>
           <input 
             type="file" 
             accept="image/*" 
@@ -135,7 +135,7 @@ const resetMenu = () => {
             @click="resetMenu" 
             class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 font-semibold px-4 py-3 rounded-xl transition text-xs cursor-pointer"
           >
-            Kosongkan Menu
+            Kosongkan
           </button>
         </div>
       </div>
