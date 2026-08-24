@@ -1,70 +1,93 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '../lib/supabase'
+import logoBgn from '@/assets/sppg.webp'
 
-const menu = ref({
-  nama: 'Memuat data...',
-  nutrisi: 'Memuat detail gizi...',
-  image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'
-})
+const namaMenu = ref('')
+const nutrisiMenu = ref('')
+const imageUrl = ref('')
+const isLoading = ref(true) // Status loading agar tidak ada lompatan visual
 const tanggal = ref('')
 
-const fetchDetail = async () => {
+const fetchDetailMenu = async () => {
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   tanggal.value = new Date().toLocaleDateString('id-ID', options)
 
-  // Mengambil data PALING BARU dari database Supabase Cloud
   const { data, error } = await supabase
     .from('menu')
     .select('*')
-    .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
     .limit(1)
 
   if (data && data.length > 0) {
-    menu.value = data[0]
+    namaMenu.value = data[0].nama
+    nutrisiMenu.value = data[0].nutrisi
+    imageUrl.value = data[0].image_url
   } else {
-    menu.value.nama = 'Belum Ada Menu'
-    menu.value.nutrisi = 'Admin belum mempublish menu makanan hari ini.'
+    namaMenu.value = 'Belum Ada Menu'
+    nutrisiMenu.value = '-'
+    imageUrl.value = ''
   }
+  isLoading.value = false
 }
 
 onMounted(() => {
-  fetchDetail()
+  fetchDetailMenu()
 
-  // Real-time listener: jika admin ganti menu saat siswa sedang buka halaman ini, langsung berubah otomatis!
-  supabase
-    .channel('public:menu-detail')
+  // Realtime subscription agar langsung update instan
+  const channel = supabase
+    .channel('public:menu')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'menu' }, () => {
-      fetchDetail()
+      fetchDetailMenu()
     })
     .subscribe()
+
+  onUnmounted(() => {
+    supabase.removeChannel(channel)
+  })
 })
 </script>
 
 <template>
   <div class="min-h-screen bg-slate-950 text-white p-4 flex justify-center items-center">
-    <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+    <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-center space-y-6">
       
-      <div class="text-center">
-        <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 text-xs font-semibold px-3 py-1 rounded-full">
-          Verifikasi Menu MBG Resmi
-        </span>
-        <h1 class="text-lg font-bold mt-2 text-cyan-400">Detail Gizi & Makanan</h1>
+      <!-- Header SPPG -->
+      <div class="flex items-center space-x-3 pb-3 border-b border-slate-800 text-left">
+        <img :src="logoBgn" alt="Logo SPPG" class="w-11 h-11 object-contain" />
+        <div>
+          <h1 class="text-lg font-extrabold text-cyan-400">SPPG SLEMAN TIMUR</h1>
+          <p class="text-[10px] text-slate-400">Verifikasi Menu MBG Resmi</p>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <h2 class="text-xl font-bold text-cyan-400">Detail Gizi & Makanan</h2>
         <p class="text-xs text-slate-400">{{ tanggal }}</p>
       </div>
 
-      <div class="overflow-hidden rounded-xl border border-slate-800 h-48 bg-slate-950 shadow-inner flex justify-center items-center">
-        <img :src="menu.image_url" alt="Foto Makanan" class="w-full h-full object-cover" />
+      <!-- Area Foto dengan State Loading yang Mulus -->
+      <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-center items-center min-h-[224px]">
+        <div v-if="isLoading" class="text-xs text-slate-500 animate-pulse flex flex-col items-center space-y-2">
+          <div class="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+          <span>Memuat data menu terbaru...</span>
+        </div>
+        <img v-else-if="imageUrl" :src="imageUrl" alt="Menu Makanan" class="w-full h-56 object-cover rounded-lg shadow-md transition-opacity duration-300" />
+        <div v-else class="h-56 flex items-center justify-center text-xs text-slate-500">
+          Belum ada foto menu yang di-publish.
+        </div>
       </div>
 
-      <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-1">
-        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Nama Menu</p>
-        <p class="text-base font-bold text-cyan-400 capitalize">{{ menu.nama }}</p>
+      <!-- Nama Menu -->
+      <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-left space-y-1">
+        <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Nama Menu</p>
+        <p class="text-base font-bold text-cyan-400 capitalize">{{ isLoading ? 'Memuat...' : namaMenu }}</p>
       </div>
 
-      <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-1">
-        <p class="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider">Kandungan Nutrisi & Gizi</p>
-        <p class="text-sm text-slate-300 leading-relaxed whitespace-pre-line">{{ menu.nutrisi }}</p>
+      <!-- Nutrisi -->
+      <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-left space-y-1">
+        <p class="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">Kandungan Nutrisi & Gizi</p>
+        <p class="text-sm text-slate-200 whitespace-pre-line">{{ isLoading ? 'Memuat...' : nutrisiMenu }}</p>
       </div>
 
     </div>
