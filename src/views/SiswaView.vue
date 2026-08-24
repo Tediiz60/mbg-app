@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import QrGenerator from '../components/QrGenerator.vue'
 
 const qrValue = ref('')
+const hasMenu = ref(false)
 const namaMenu = ref('Belum Ada Menu')
 const tanggal = ref('')
 
@@ -13,13 +14,18 @@ const loadMenuData = () => {
   const savedData = localStorage.getItem('mbg_menu')
   if (savedData) {
     const data = JSON.parse(savedData)
-    namaMenu.value = data.nama || 'Menu Baru'
-    
-    // Gunakan parameter pendek agar QR code tetap besar, bersih, dan mudah discan HP
-    qrValue.value = `${window.location.origin}/detail?m=${encodeURIComponent(data.nama)}`
-  } else {
-    qrValue.value = `${window.location.origin}/detail`
+    if (data && data.nama) {
+      hasMenu.value = true
+      namaMenu.value = data.nama
+      qrValue.value = `${window.location.origin}/detail?m=${encodeURIComponent(data.nama)}`
+      return
+    }
   }
+
+  // Jika admin belum upload sama sekali
+  hasMenu.value = false
+  namaMenu.value = 'Belum Ada Menu'
+  qrValue.value = ''
 }
 
 onMounted(() => {
@@ -32,28 +38,38 @@ onMounted(() => {
   <div class="min-h-screen bg-slate-950 text-white p-4 flex justify-center items-center">
     <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-center space-y-6">
       
-      <!-- HEADER BERSIH: Tombol "Admin Login" sudah DIHAPUS total agar aman -->
       <div class="text-left pb-3 border-b border-slate-800">
         <h1 class="text-xl font-extrabold text-cyan-400">SCAN MENU MBG</h1>
         <p class="text-[11px] text-slate-400">Makan Bergizi Gratis - SMAN/SMK</p>
       </div>
 
-      <!-- KOTAK QR CODE (Normal, besar, dan langsung bisa discan) -->
-      <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 flex justify-center items-center">
-        <div class="bg-white p-3 rounded-xl shadow-lg inline-block">
-          <QrGenerator v-if="qrValue" :value="qrValue" :size="180" />
+      <!-- KONDISI: Jika admin BELUM upload, QR code tidak muncul -->
+      <div v-if="!hasMenu" class="bg-slate-950 p-8 rounded-xl border border-slate-800 space-y-3">
+        <div class="text-3xl">⏳</div>
+        <p class="text-sm font-semibold text-amber-400">Admin Belum Mempublish Menu</p>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          QR Code dan informasi menu makanan hari ini akan otomatis muncul setelah admin selesai mengupload foto dan rincian menu.
+        </p>
+      </div>
+
+      <!-- KONDISI: Jika admin SUDAH upload, QR code MUNCUL -->
+      <div v-else class="space-y-4">
+        <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 flex justify-center items-center">
+          <div class="bg-white p-3 rounded-xl shadow-lg inline-block">
+            <QrGenerator :value="qrValue" :size="180" />
+          </div>
         </div>
-      </div>
 
-      <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-1">
-        <p class="text-xs font-semibold text-slate-400 uppercase">Menu Makanan Terbaru</p>
-        <p class="text-lg font-bold text-cyan-400 capitalize">{{ namaMenu }}</p>
-        <p class="text-xs text-slate-500">{{ tanggal }}</p>
-      </div>
+        <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-1">
+          <p class="text-xs font-semibold text-slate-400 uppercase">Menu Makanan Aktif</p>
+          <p class="text-lg font-bold text-cyan-400 capitalize">{{ namaMenu }}</p>
+          <p class="text-xs text-slate-500">{{ tanggal }}</p>
+        </div>
 
-      <p class="text-xs text-slate-500 italic">
-        📱 Scan QR Code di atas menggunakan HP siswa untuk melihat detail foto & nutrisi gizi makanan.
-      </p>
+        <p class="text-xs text-slate-500 italic">
+          📱 Scan QR Code di atas menggunakan HP siswa untuk melihat detail foto editan & nutrisi gizi makanan.
+        </p>
+      </div>
 
     </div>
   </div>
