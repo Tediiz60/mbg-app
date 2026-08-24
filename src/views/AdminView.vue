@@ -40,13 +40,16 @@ const publishMenu = () => {
   }
 
   localStorage.setItem('mbg_menu', JSON.stringify(menuData))
-  alert('Menu berhasil dipublish!')
+  alert('Menu berhasil dipublish & QR Code ter-update!')
 }
 </script>
 
 <template>
   <div class="min-h-screen bg-slate-900 text-white p-6 max-w-2xl mx-auto">
-    <h1 class="text-2xl font-bold mb-6 text-emerald-400">ADMIN - INPUT & PUBLISH MENU MBG</h1>
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-emerald-400">ADMIN - INPUT & PUBLISH MENU MBG</h1>
+      <span class="bg-slate-800 text-emerald-400 text-xs px-3 py-1 rounded-full border border-slate-700">Admin Portal</span>
+    </div>
 
     <div class="space-y-4 bg-slate-800 p-6 rounded-xl border border-slate-700">
       <div>
@@ -86,9 +89,9 @@ const publishMenu = () => {
 
       <button 
         @click="publishMenu" 
-        class="w-full mt-4 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-lg transition"
+        class="w-full mt-4 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-lg transition flex items-center justify-center gap-2"
       >
-        Publish Menu
+        <span>⚡</span> PUBLISH MENU & KIRIM KE SISWA
       </button>
     </div>
   </div>
