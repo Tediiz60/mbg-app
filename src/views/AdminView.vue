@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { supabase } from '../lib/supabase'
 import logoBgn from '@/assets/sppg.webp'
+
+const router = useRouter()
 
 interface Cabang {
   nama: string
@@ -28,7 +31,6 @@ const fileInput = ref<HTMLInputElement | null>(null)
 const previewUrl = ref('')
 const isUploading = ref(false)
 
-// URL QR Code aman tanpa error TypeScript di template
 const qrCodeUrl = computed(() => {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
   const targetUrl = `${baseUrl}/detail/${activeCabang.value.slug}`
@@ -98,10 +100,15 @@ const handlePublish = async () => {
   if (insertError) {
     alert('Gagal publish: ' + insertError.message)
   } else {
-    alert('Berhasil publish poster untuk ' + activeCabang.value.nama + '! Poster aktif dan harus di-scan via QR.')
+    alert('Berhasil publish poster untuk ' + activeCabang.value.nama + '!')
     previewUrl.value = ''
     if (fileInput.value) fileInput.value.value = ''
   }
+}
+
+// ✨ Fungsi untuk "Teleport" / Preview langsung ke halaman siswa cabang aktif
+const goToStudentView = () => {
+  router.push(`/detail/${activeCabang.value.slug}`)
 }
 </script>
 
@@ -159,7 +166,7 @@ const handlePublish = async () => {
           <button @click="handleLogout" class="bg-red-500/20 text-red-400 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer">Keluar</button>
         </div>
 
-        <!-- KOTAK QR CODE LANGSUNG DI ADMIN (BERSIH TANPA ERROR MERAH) -->
+        <!-- KOTAK QR CODE & TOMBOL TELEPORT KE HALAMAN SISWA -->
         <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center space-y-3">
           <p class="text-xs text-cyan-400 font-bold">QR Code Cabang Anda:</p>
           <div class="bg-white p-3 rounded-xl inline-block shadow-md">
@@ -170,7 +177,14 @@ const handlePublish = async () => {
             />
           </div>
           <p class="text-[10px] text-slate-400 font-mono">Link: /detail/{{ activeCabang.slug }}</p>
-          <p class="text-[11px] text-emerald-400 italic">💡 Poster yang di-publish harus di-scan oleh siswa untuk melihat hasilnya.</p>
+          
+          <!-- ✨ TOMBOL TELEPORT / PREVIEW LANGSUNG KE HALAMAN SISWA CABANG INI -->
+          <button 
+            @click="goToStudentView"
+            class="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-xl text-xs cursor-pointer transition flex items-center justify-center space-x-2"
+          >
+            <span>🔗 Buka Tampilan Siswa ({{ activeCabang.nama }})</span>
+          </button>
         </div>
 
         <div>
