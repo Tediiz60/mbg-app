@@ -7,7 +7,6 @@ import logoBgn from '@/assets/sppg.webp'
 const route = useRoute()
 const slug = route.params.slug as string
 
-// Mapping slug URL ke Nama Cabang yang sesuai dengan database
 const mappingCabang: Record<string, string> = {
   'sleman-timur': 'SPPG Sleman Timur',
   'djati-pasundan': 'SPPG Djati Pasundan',
@@ -23,6 +22,7 @@ const isLoading = ref(true)
 const tanggal = ref('')
 
 const fetchDetailMenu = async () => {
+  isLoading.value = true
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   tanggal.value = new Date().toLocaleDateString('id-ID', options)
 
@@ -50,14 +50,10 @@ let channel: any = null
 onMounted(() => {
   fetchDetailMenu()
 
-  // Real-time listener khusus cabang ini
   channel = supabase
     .channel(`public:menu:${cabangMenu.value}`)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'menu' }, (payload: any) => {
-      // Jika data baru masuk sesuai cabang ini, langsung update otomatis
-      if (!payload.new || payload.new.cabang === cabangMenu.value) {
-        fetchDetailMenu()
-      }
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'menu' }, () => {
+      fetchDetailMenu()
     })
     .subscribe()
 })
@@ -70,38 +66,29 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-950 text-white p-4 sm:p-6 flex justify-center items-center relative overflow-y-auto">
-    
-    <!-- Background Glow Ornaments -->
-    <div class="absolute -top-32 -left-32 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-32 -right-32 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-    <div class="w-full max-w-xl bg-slate-900/90 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 shadow-2xl text-center space-y-6 relative z-10 my-6">
+  <div class="min-h-screen bg-slate-950 text-white p-4 sm:p-6 flex justify-center items-center">
+    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl text-center space-y-6">
       
       <!-- Header SPPG -->
-      <div class="flex items-center space-x-3 pb-4 border-b border-slate-800/80 text-left">
-        <div class="relative">
-          <div class="absolute inset-0 bg-cyan-500/20 rounded-full blur-md"></div>
-          <img :src="logoBgn" alt="Logo SPPG" class="w-12 h-12 object-contain relative z-10" />
-        </div>
+      <div class="flex items-center space-x-3 pb-4 border-b border-slate-800 text-left">
+        <img :src="logoBgn" alt="Logo SPPG" class="w-12 h-12 object-contain" />
         <div>
-          <h1 class="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-300">{{ cabangMenu }}</h1>
+          <h1 class="text-lg font-extrabold text-cyan-400">{{ cabangMenu }}</h1>
           <p class="text-[10px] tracking-wide text-slate-400 font-medium">Verifikasi Menu MBG Resmi & Analisa Gizi</p>
         </div>
       </div>
 
       <div class="space-y-1">
         <h2 class="text-xl font-bold text-slate-100 tracking-tight">Poster Menu & Kandungan Gizi</h2>
-        <div class="inline-block px-3 py-1 bg-slate-800/60 border border-slate-700/50 rounded-full text-xs text-cyan-300 font-medium shadow-inner">
+        <div class="inline-block px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-xs text-cyan-300 font-medium">
           📅 {{ tanggal }}
         </div>
       </div>
 
       <!-- Area Poster -->
-      <div class="bg-slate-950/90 p-3 rounded-2xl border border-slate-800/80 flex justify-center items-center min-h-[300px] relative overflow-hidden shadow-inner">
-        <div v-if="isLoading" class="absolute inset-0 bg-slate-900 animate-pulse flex flex-col items-center justify-center space-y-3">
-          <div class="w-8 h-8 border-3 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-          <span class="text-xs text-slate-400 font-medium tracking-wide">Memuat poster terbaru...</span>
+      <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex justify-center items-center min-h-[300px]">
+        <div v-if="isLoading" class="text-xs text-slate-400">
+          Memuat poster terbaru...
         </div>
         
         <img 
@@ -111,13 +98,13 @@ onUnmounted(() => {
           class="w-full rounded-xl shadow-lg object-contain max-h-[70vh]" 
         />
         
-        <div v-else class="h-60 flex items-center justify-center text-xs text-slate-500 italic">
-          Belum ada poster menu yang di-publish oleh admin untuk cabang ini.
+        <div v-else class="text-xs text-slate-500 italic">
+          Belum ada poster menu yang di-publish untuk cabang ini.
         </div>
       </div>
 
-      <p class="text-xs text-slate-400 italic bg-slate-950/40 py-2.5 px-4 rounded-xl border border-slate-800/50">
-        ✨ Poster di atas mencakup informasi menu, porsi, jadwal distribusi, dan tabel analisa gizi resmi. (Live Real-Time Update)
+      <p class="text-xs text-slate-400 italic bg-slate-950/40 py-2.5 px-4 rounded-xl border border-slate-800">
+        ✨ Poster di atas mencakup informasi menu, porsi, jadwal distribusi, dan tabel analisa gizi resmi.
       </p>
 
     </div>
