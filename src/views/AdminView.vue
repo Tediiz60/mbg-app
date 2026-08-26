@@ -3,20 +3,43 @@ import { ref } from 'vue'
 import { supabase } from '../lib/supabase'
 import logoBgn from '@/assets/sppg.webp'
 
-// 6 Pilihan Cabang SPPG
+// Daftar 6 Cabang beserta Password login khususnya
 const daftarCabang = [
-  'SPPG Sleman Timur',
-  'SPPG Djati Pasundan',
-  'SPPG Cihampelas',
-  'SPPG Katapang',
-  'SPPG Sukahaji',
-  'SPPG Bandung Berkah'
+  { nama: 'SPPG Sleman Timur', password: 'sleman123' },
+  { nama: 'SPPG Djati Pasundan', password: 'djati123' },
+  { nama: 'SPPG Cihampelas', password: 'cihampelas123' },
+  { nama: 'SPPG Katapang', password: 'katapang123' },
+  { nama: 'SPPG Sukahaji', password: 'sukahaji123' },
+  { nama: 'SPPG Bandung Berkah', password: 'bandung123' }
 ]
 
-const selectedCabang = ref(daftarCabang[0])
+const isLoggedIn = ref(false)
+const inputCabang = ref('SPPG Sleman Timur')
+const inputPassword = ref('')
+const errorLogin = ref(false)
+
 const fileInput = ref<HTMLInputElement | null>(null)
 const previewUrl = ref('')
 const isUploading = ref(false)
+
+// Fungsi Login
+const handleLogin = () => {
+  const cabangDitemukan = daftarCabang.find(c => c.nama === inputCabang.value)
+  if (cabangDitemukan && cabangDitemukan.password === inputPassword.value) {
+    isLoggedIn.value = true
+    errorLogin.value = false
+    inputPassword.value = ''
+  } else {
+    errorLogin.value = true
+    alert('Password cabang salah! Silakan coba lagi.')
+  }
+}
+
+const handleLogout = () => {
+  isLoggedIn.value = false
+  inputPassword.value = ''
+  previewUrl.value = ''
+}
 
 const handleFileChange = (e: Event) => {
   const target = e.target as HTMLInputElement
@@ -27,8 +50,8 @@ const handleFileChange = (e: Event) => {
 }
 
 const handlePublish = async () => {
-  if (!fileInput.value?.files?.[0] || !selectedCabang.value) {
-    alert('Mohon pilih cabang SPPG dan upload foto poster menu terlebih dahulu!')
+  if (!fileInput.value?.files?.[0]) {
+    alert('Mohon pilih dan upload foto poster menu terlebih dahulu!')
     return
   }
 
@@ -36,7 +59,7 @@ const handlePublish = async () => {
   const file = fileInput.value.files[0]
   const fileName = `${Date.now()}-${file.name}`
 
-  // 1. Upload foto poster ke Supabase Storage
+  // 1. Upload foto ke Supabase Storage
   const { error: uploadError } = await supabase.storage
     .from('menu-images')
     .upload(fileName, file)
@@ -47,17 +70,17 @@ const handlePublish = async () => {
     return
   }
 
-  // 2. Ambil Public URL foto
+  // 2. Ambil Public URL
   const { data: publicUrlData } = supabase.storage
     .from('menu-images')
     .getPublicUrl(fileName)
 
-  // 3. Simpan data ke tabel menu
+  // 3. Simpan ke database dengan nama cabang yang sedang login
   const { error: insertError } = await supabase
     .from('menu')
     .insert([
       {
-        cabang: selectedCabang.value,
+        cabang: inputCabang.value,
         image_url: publicUrlData.publicUrl
       }
     ])
@@ -65,17 +88,11 @@ const handlePublish = async () => {
   isUploading.value = false
 
   if (insertError) {
-    alert('Gagal mempublish menu: ' + insertError.message)
+    alert('Gagal mempublish poster: ' + insertError.message)
   } else {
-    alert('Berhasil! Poster menu untuk ' + selectedCabang.value + ' berhasil dipublish secara real-time.')
-    handleClear()
-  }
-}
-
-const handleClear = () => {
-  previewUrl.value = ''
-  if (fileInput.value) {
-    fileInput.value.value = ''
+    alert('Berhasil! Poster untuk ' + inputCabang.value + ' berhasil dipublish secara real-time.')
+    previewUrl.value = ''
+    if (fileInput.value) fileInput.value.value = ''
   }
 }
 </script>
@@ -83,13 +100,13 @@ const handleClear = () => {
 <template>
   <div class="min-h-screen bg-slate-950 text-white p-4 sm:p-6 flex justify-center items-center relative overflow-y-auto">
     
-    <!-- Background Glow Ornaments -->
+    <!-- Background Glow -->
     <div class="absolute -top-32 -right-32 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -bottom-32 -left-32 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
     <div class="w-full max-w-lg bg-slate-900/80 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 shadow-2xl space-y-6 relative z-10 my-8">
       
-      <!-- Header Admin -->
+      <!-- Header -->
       <div class="flex items-center space-x-3 pb-4 border-b border-slate-800/80">
         <div class="relative">
           <div class="absolute inset-0 bg-cyan-500/20 rounded-full blur-md"></div>
@@ -97,27 +114,62 @@ const handleClear = () => {
         </div>
         <div>
           <h1 class="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-300">ADMIN PORTAL SPPG</h1>
-          <p class="text-[10px] tracking-wide text-slate-400 font-medium">Upload Poster Gizi & Pilih Cabang</p>
+          <p class="text-[10px] tracking-wide text-slate-400 font-medium">Sistem Login Keamanan Per Cabang</p>
         </div>
       </div>
 
-      <div class="space-y-5">
-        <!-- Pilihan Cabang SPPG -->
-        <div>
-          <label class="block text-xs font-bold text-cyan-400 uppercase mb-2 tracking-wider">🏢 Pilih Cabang SPPG</label>
-          <select 
-            v-model="selectedCabang"
-            class="w-full bg-slate-950/90 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 shadow-inner cursor-pointer"
+      <!-- FORM LOGIN ADMIN CABANG -->
+      <div v-if="!isLoggedIn" class="space-y-4 py-2">
+        <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80 space-y-3">
+          <p class="text-xs font-bold text-cyan-400 uppercase tracking-wider">🔐 Silakan Login Admin Cabang</p>
+          
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Pilih Cabang SPPG</label>
+            <select 
+              v-model="inputCabang"
+              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 cursor-pointer"
+            >
+              <option v-for="c in daftarCabang" :key="c.nama" :value="c.nama">{{ c.nama }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Password Cabang</label>
+            <input 
+              v-model="inputPassword"
+              type="password"
+              placeholder="Masukkan password cabang..."
+              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500"
+              @keyup.enter="handleLogin"
+            />
+          </div>
+
+          <button 
+            @click="handleLogin"
+            class="w-full bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold py-3 rounded-xl transition duration-200 text-sm shadow-lg shadow-cyan-500/20 cursor-pointer mt-2"
           >
-            <option v-for="cabang in daftarCabang" :key="cabang" :value="cabang">
-              {{ cabang }}
-            </option>
-          </select>
+            MASUK ADMIN CABANG
+          </button>
+        </div>
+      </div>
+
+      <!-- PANEL UPLOAD POSTER (SETELAH LOGIN BERHASIL) -->
+      <div v-else class="space-y-5">
+        <div class="flex justify-between items-center bg-cyan-950/40 border border-cyan-800/50 p-3.5 rounded-2xl">
+          <div>
+            <p class="text-[10px] text-cyan-300 font-semibold uppercase">Status Login:</p>
+            <p class="text-sm font-bold text-white">🟢 {{ inputCabang }}</p>
+          </div>
+          <button 
+            @click="handleLogout"
+            class="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-xl text-xs font-bold transition duration-200 cursor-pointer"
+          >
+            Keluar
+          </button>
         </div>
 
-        <!-- Upload Foto Poster -->
         <div>
-          <label class="block text-xs font-bold text-emerald-400 uppercase mb-2 tracking-wider">🖼️ Upload Foto Poster Menu (Lengkap Analisa Gizi)</label>
+          <label class="block text-xs font-bold text-emerald-400 uppercase mb-2 tracking-wider">🖼️ Upload Poster Menu Cabang Ini</label>
           <input 
             ref="fileInput" 
             type="file" 
@@ -127,7 +179,6 @@ const handleClear = () => {
           />
         </div>
 
-        <!-- Preview Poster -->
         <div v-if="previewUrl" class="space-y-1.5">
           <p class="text-xs font-medium text-slate-400">Preview Poster:</p>
           <div class="bg-slate-950 p-2 rounded-2xl border border-slate-800 max-h-80 overflow-y-auto">
@@ -135,22 +186,13 @@ const handleClear = () => {
           </div>
         </div>
 
-        <!-- Tombol Aksi -->
-        <div class="flex space-x-3 pt-3">
-          <button 
-            @click="handlePublish" 
-            :disabled="isUploading"
-            class="flex-1 bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold py-3 rounded-xl transition duration-200 text-sm shadow-lg shadow-cyan-500/20 disabled:opacity-50 cursor-pointer"
-          >
-            {{ isUploading ? 'MENYIMPAN...' : '⚡ PUBLISH POSTER' }}
-          </button>
-          <button 
-            @click="handleClear" 
-            class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 font-semibold px-5 py-3 rounded-xl transition duration-200 text-sm border border-slate-700/50 cursor-pointer"
-          >
-            Kosongkan
-          </button>
-        </div>
+        <button 
+          @click="handlePublish" 
+          :disabled="isUploading"
+          class="w-full bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold py-3 rounded-xl transition duration-200 text-sm shadow-lg shadow-cyan-500/20 disabled:opacity-50 cursor-pointer"
+        >
+          {{ isUploading ? 'MENYIMPAN...' : '⚡ PUBLISH POSTER KE CABANG INI' }}
+        </button>
       </div>
 
     </div>
