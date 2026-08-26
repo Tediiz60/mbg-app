@@ -41,12 +41,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="bg-slate-950 text-white min-h-screen w-full py-8 px-4 flex justify-center overflow-y-auto">
-    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 my-auto">
+  <!-- Diubah agar mulai dari atas (justify-start) dan ada jarak padding vertikal (py-10) supaya bisa di-scroll -->
+  <div class="bg-slate-950 text-white min-h-screen w-full py-10 px-4 flex flex-col items-center justify-start overflow-y-auto">
+    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
       
       <!-- Logo & Header Cabang -->
       <div class="flex flex-col items-center text-center border-b border-slate-800 pb-5 space-y-3">
-        <img :src="logoMbg" alt="Logo Badan Gizi Nasional" class="w-20 h-20 object-contain drop-shadow-md rounded-full" />
+        <img :src="logoMbg" alt="Logo Badan Gizi Nasional" class="w-20 h-20 object-contain drop-shadow-md rounded-full bg-white p-1" />
         <div>
           <h1 class="text-xl font-bold text-cyan-400">{{ cabangMenu }}</h1>
           <p class="text-xs text-slate-400">Portal Verifikasi Menu Resmi</p>
@@ -66,7 +67,7 @@ onMounted(async () => {
           </svg>
           Memuat poster...
         </div>
-        <img v-else-if="imageUrl" :src="imageUrl" alt="Poster Menu" class="w-full rounded-xl object-contain max-h-[75vh] shadow-md" />
+        <img v-else-if="imageUrl" :src="imageUrl" alt="Poster Menu" class="w-full rounded-xl object-contain shadow-md" />
         <div v-else class="text-sm text-slate-500 italic py-8">Belum ada poster menu aktif untuk cabang ini.</div>
       </div>
 
