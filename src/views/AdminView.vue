@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
 import { supabase } from '../lib/supabase'
 import logoBgn from '@/assets/sppg.webp'
-
-const router = useRouter()
 
 interface Cabang {
   nama: string
@@ -30,6 +27,13 @@ const activeCabang = ref<Cabang>(daftarCabang[0]!)
 const fileInput = ref<HTMLInputElement | null>(null)
 const previewUrl = ref('')
 const isUploading = ref(false)
+
+// URL QR Code aman tanpa error TypeScript di template
+const qrCodeUrl = computed(() => {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+  const targetUrl = `${baseUrl}/detail/${activeCabang.value.slug}`
+  return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(targetUrl)}`
+})
 
 const handleLogin = () => {
   const found = daftarCabang.find(c => c.nama === inputCabangNama.value)
@@ -94,10 +98,9 @@ const handlePublish = async () => {
   if (insertError) {
     alert('Gagal publish: ' + insertError.message)
   } else {
-    alert('Berhasil publish poster untuk ' + activeCabang.value.nama)
-    
-    // ✨ OTOMATIS PINDAH KE HALAMAN QR / DETAIL CABANG TERSEBUT
-    router.push(`/detail/${activeCabang.value.slug}`)
+    alert('Berhasil publish poster untuk ' + activeCabang.value.nama + '! Poster aktif dan harus di-scan via QR.')
+    previewUrl.value = ''
+    if (fileInput.value) fileInput.value.value = ''
   }
 }
 </script>
@@ -156,13 +159,22 @@ const handlePublish = async () => {
           <button @click="handleLogout" class="bg-red-500/20 text-red-400 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer">Keluar</button>
         </div>
 
-        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-1">
-          <p class="text-cyan-400 font-bold">Link QR Code Cabang Ini:</p>
-          <p class="text-slate-300 font-mono text-[11px]">/detail/{{ activeCabang.slug }}</p>
+        <!-- KOTAK QR CODE LANGSUNG DI ADMIN (BERSIH TANPA ERROR MERAH) -->
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center space-y-3">
+          <p class="text-xs text-cyan-400 font-bold">QR Code Cabang Anda:</p>
+          <div class="bg-white p-3 rounded-xl inline-block shadow-md">
+            <img 
+              :src="qrCodeUrl" 
+              alt="QR Code Cabang" 
+              class="w-32 h-32 mx-auto object-contain"
+            />
+          </div>
+          <p class="text-[10px] text-slate-400 font-mono">Link: /detail/{{ activeCabang.slug }}</p>
+          <p class="text-[11px] text-emerald-400 italic">💡 Poster yang di-publish harus di-scan oleh siswa untuk melihat hasilnya.</p>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-emerald-400 mb-2">Upload Poster</label>
+          <label class="block text-xs font-bold text-emerald-400 mb-2">Upload Poster Menu Baru</label>
           <input ref="fileInput" type="file" accept="image/*" @change="handleFileChange" class="w-full text-xs text-slate-400 bg-slate-950 border border-slate-800 rounded-xl p-2 cursor-pointer" />
         </div>
 
