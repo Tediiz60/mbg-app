@@ -31,9 +31,11 @@ const fileInput = ref<HTMLInputElement | null>(null)
 const previewUrl = ref('')
 const isUploading = ref(false)
 
+// Status untuk menandakan apakah poster sudah berhasil di-publish pada sesi ini
+const hasPublished = ref(false)
+
 const qrCodeUrl = computed(() => {
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-  const targetUrl = `${baseUrl}/detail/${activeCabang.value.slug}`
+  const targetUrl = `https://mbg-5mm6.vercel.app/detail/${activeCabang.value.slug}`
   return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(targetUrl)}`
 })
 
@@ -44,6 +46,7 @@ const handleLogin = () => {
     activeCabang.value = found
     inputPassword.value = ''
     showPassword.value = false
+    hasPublished.value = false // Reset status saat ganti login
   } else {
     alert('Password cabang salah!')
   }
@@ -52,6 +55,7 @@ const handleLogin = () => {
 const handleLogout = () => {
   isLoggedIn.value = false
   previewUrl.value = ''
+  hasPublished.value = false
   if (fileInput.value) fileInput.value.value = ''
 }
 
@@ -101,12 +105,12 @@ const handlePublish = async () => {
     alert('Gagal publish: ' + insertError.message)
   } else {
     alert('Berhasil publish poster untuk ' + activeCabang.value.nama + '!')
+    hasPublished.value = true // ✨ MUNCULKAN QR CODE & TOMBOL LIHAT MENU SETELAH UPLOAD BERHASIL
     previewUrl.value = ''
     if (fileInput.value) fileInput.value.value = ''
   }
 }
 
-// ✨ Fungsi untuk "Teleport" / Preview langsung ke halaman siswa cabang aktif
 const goToStudentView = () => {
   router.push(`/detail/${activeCabang.value.slug}`)
 }
@@ -166,29 +170,9 @@ const goToStudentView = () => {
           <button @click="handleLogout" class="bg-red-500/20 text-red-400 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer">Keluar</button>
         </div>
 
-        <!-- KOTAK QR CODE & TOMBOL TELEPORT KE HALAMAN SISWA -->
-        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center space-y-3">
-          <p class="text-xs text-cyan-400 font-bold">QR Code Cabang Anda:</p>
-          <div class="bg-white p-3 rounded-xl inline-block shadow-md">
-            <img 
-              :src="qrCodeUrl" 
-              alt="QR Code Cabang" 
-              class="w-32 h-32 mx-auto object-contain"
-            />
-          </div>
-          <p class="text-[10px] text-slate-400 font-mono">Link: /detail/{{ activeCabang.slug }}</p>
-          
-          <!-- ✨ TOMBOL TELEPORT / PREVIEW LANGSUNG KE HALAMAN SISWA CABANG INI -->
-          <button 
-            @click="goToStudentView"
-            class="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-xl text-xs cursor-pointer transition flex items-center justify-center space-x-2"
-          >
-            <span>🔗 Buka Tampilan Siswa ({{ activeCabang.nama }})</span>
-          </button>
-        </div>
-
+        <!-- FORM UPLOAD UTAMA (TAMPIL DI AWAL) -->
         <div>
-          <label class="block text-xs font-bold text-emerald-400 mb-2">Upload Poster Menu Baru</label>
+          <label class="block text-xs font-bold text-emerald-400 mb-2">Upload Poster Menu Baru Hari Ini</label>
           <input ref="fileInput" type="file" accept="image/*" @change="handleFileChange" class="w-full text-xs text-slate-400 bg-slate-950 border border-slate-800 rounded-xl p-2 cursor-pointer" />
         </div>
 
@@ -199,6 +183,29 @@ const goToStudentView = () => {
         <button @click="handlePublish" :disabled="isUploading" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3 rounded-xl text-sm cursor-pointer disabled:opacity-50">
           {{ isUploading ? 'MENYIMPAN...' : 'PUBLISH POSTER' }}
         </button>
+
+        <!-- ✨ KOTAK QR CODE & TOMBOL LIHAT MENU HANYA MUNCUL SETELAH BERHASIL UPLOAD -->
+        <div v-if="hasPublished" class="bg-slate-950 p-4 rounded-xl border border-emerald-500/50 text-center space-y-3 mt-4 animate-fade-in">
+          <p class="text-xs text-emerald-400 font-bold">🎉 Poster Berhasil Dipublish!</p>
+          <p class="text-[11px] text-slate-300">QR Code untuk siswa melihat menu hari ini:</p>
+          
+          <div class="bg-white p-3 rounded-xl inline-block shadow-md">
+            <img 
+              :src="qrCodeUrl" 
+              alt="QR Code Cabang" 
+              class="w-32 h-32 mx-auto object-contain"
+            />
+          </div>
+          <p class="text-[10px] text-slate-400 font-mono">Link: /detail/{{ activeCabang.slug }}</p>
+          
+          <button 
+            @click="goToStudentView"
+            class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs cursor-pointer transition flex items-center justify-center space-x-2 shadow-lg"
+          >
+            <span>👀 Lihat Menu Tampilan Siswa ({{ activeCabang.nama }})</span>
+          </button>
+        </div>
+
       </div>
 
     </div>
