@@ -6,13 +6,13 @@ import logoMbg from '@/assets/mbg.jpg'
 
 const router = useRouter()
 
-// --- KODE KEAMANAN MASTER ADMIN ---
+// --- KODE KEAMANAN MASTER ADMIN (DIUBAH JADI patra2026) ---
 const isMasterAuthenticated = ref(false)
 const masterPasswordInput = ref('')
 const showMasterPassword = ref(false)
-const MASTER_KEY = 'bgn-pusat-2026' // Ganti password master pusat sesukamu di sini!
+const MASTER_KEY = 'patra2026' 
 
-// State untuk Modal Alert Umum (Pengganti alert bawaan browser)
+// State untuk Modal Alert Umum
 const showAlertModal = ref(false)
 const alertTitle = ref('')
 const alertMessage = ref('')
@@ -165,7 +165,7 @@ const resetUpload = () => {
     <!-- Efek Cahaya Background -->
     <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-    <!-- MODAL ALERT CUSTOM (PENGGANTI ALERT BAWAAN BROWSER) -->
+    <!-- MODAL ALERT CUSTOM -->
     <div v-if="showAlertModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
       <div class="w-full max-w-sm bg-slate-900 border rounded-3xl p-6 text-center space-y-4 shadow-2xl" :class="alertType === 'success' ? 'border-cyan-500/40' : 'border-red-500/40'">
         
@@ -237,10 +237,6 @@ const resetUpload = () => {
               </button>
             </div>
           </div>
-
-          <p class="text-[10px] text-slate-500 italic text-center">
-            💡 Hint (untuk uji coba): Password master saat ini adalah <code class="text-cyan-400 font-mono">bgn-pusat-2026</code>
-          </p>
 
           <button @click="handleMasterLogin" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold py-3.5 rounded-xl text-xs cursor-pointer transition shadow-lg shadow-cyan-500/20">
             BUKA PANEL UTAMA 🔓
