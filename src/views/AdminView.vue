@@ -13,16 +13,16 @@ interface Cabang {
 }
 
 const daftarCabang: Cabang[] = [
-  { nama: 'SPPG Sleman Timur', slug: 'sleman-timur', password: 'sleman123' },
-  { nama: 'SPPG Djati Pasundan', slug: 'djati-pasundan', password: 'djati123' },
-  { nama: 'SPPG Cihampelas', slug: 'cihampelas', password: 'cihampelas123' },
-  { nama: 'SPPG Katapang', slug: 'katapang', password: 'katapang123' },
-  { nama: 'SPPG Sukahaji', slug: 'sukahaji', password: 'sukahaji123' },
-  { nama: 'SPPG Bandung Berkah', slug: 'bandung-berkah', password: 'bandung123' }
+  { nama: 'SPPG Bandung Kutawaringin Jatisari', slug: 'kutawaringin-jatisari', password: 'sppg123' },
+  { nama: 'SPPG Bandung Soreang Soreang 3', slug: 'soreang-soreang-3', password: 'sppg123' },
+  { nama: 'SPPG Bandung Katapang Gandasari 2', slug: 'katapang-gandasari-2', password: 'sppg123' },
+  { nama: 'SPPG Kuningan Kadugede Kadugede 2', slug: 'kuningan-kadugede-2', password: 'sppg123' },
+  { nama: 'SPPG Kuningan Jalaksana Maniskidul', slug: 'jalaksana-maniskidul', password: 'sppg123' },
+  { nama: 'SPPG Bandung Barat Cihampelas Mekarmukti 2', slug: 'cihampelas-mekarmukti-2', password: 'sppg123' }
 ]
 
 const isLoggedIn = ref(false)
-const inputCabangNama = ref('SPPG Sleman Timur')
+const inputCabangNama = ref('SPPG Bandung Kutawaringin Jatisari')
 const inputPassword = ref('')
 const showPassword = ref(false)
 const activeCabang = ref<Cabang>(daftarCabang[0]!)
