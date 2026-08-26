@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '../lib/supabase'
+import logoMbg from '../assets/logo-mbg.png' // Sesuaikan path jika ditaruh di folder assets
 
 const route = useRoute()
 const slug = (route.params.slug as string) || 'sukahaji'
@@ -43,13 +44,14 @@ onMounted(async () => {
   <div class="bg-slate-950 text-white min-h-screen w-full py-6 px-4 flex flex-col items-center">
     <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
       
-      <!-- Header Cabang dengan Badge Resmi -->
-      <div class="flex items-center justify-between border-b border-slate-800 pb-4 text-left">
+      <!-- Logo & Header Cabang -->
+      <div class="flex flex-col items-center text-center border-b border-slate-800 pb-5 space-y-3">
+        <img :src="logoMbg" alt="Logo Badan Gizi Nasional" class="w-20 h-20 object-contain drop-shadow-md" />
         <div>
           <h1 class="text-xl font-bold text-cyan-400">{{ cabangMenu }}</h1>
           <p class="text-xs text-slate-400">Portal Verifikasi Menu Resmi</p>
         </div>
-        <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 font-medium shrink-0">
+        <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 font-medium">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           Terverifikasi
         </div>
