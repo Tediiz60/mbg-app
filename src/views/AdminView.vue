@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../lib/supabase'
-import logoBgn from '@/assets/mbg.jpg'
+import logoMbg from '@/assets/mbg.jpg'
 
 const router = useRouter()
 
@@ -32,11 +32,9 @@ const previewUrl = ref('')
 const isUploading = ref(false)
 const hasPublished = ref(false)
 
-// ✨ Pop-up Notifikasi Bertema SPPG
 const showSuccessModal = ref(false)
 const modalMessage = ref('')
 
-// ✨ URL QR Code sudah otomatis menggunakan domain baru sppg-menu-pinus.vercel.app
 const qrCodeUrl = computed(() => {
   const targetUrl = `https://sppg-menu-pinus.vercel.app/detail/${activeCabang.value.slug}`
   return `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(targetUrl)}`
@@ -132,7 +130,7 @@ const resetUpload = () => {
 <template>
   <div class="min-h-screen bg-slate-950 text-white p-6 flex justify-center items-center relative">
     
-    <!-- ✨ CUSTOM NOTIFICATION MODAL -->
+    <!-- MODAL NOTIFIKASI -->
     <div v-if="showSuccessModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div class="w-full max-w-sm bg-slate-900 border border-cyan-500/40 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
         <div class="w-16 h-16 bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center mx-auto text-2xl border border-cyan-500/30">
@@ -153,11 +151,12 @@ const resetUpload = () => {
 
     <div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
       
+      <!-- Header Admin -->
       <div class="flex items-center space-x-3 pb-4 border-b border-slate-800">
-        <img :src="logoBgn" alt="Logo" class="w-12 h-12 object-contain" />
+        <img :src="logoMbg" alt="Logo MBG" class="w-12 h-12 object-contain rounded-full" />
         <div>
-          <h1 class="text-lg font-bold text-cyan-400">ADMIN PORTAL SPPG</h1>
-          <p class="text-xs text-slate-400">Login & Upload Per Cabang</p>
+          <h1 class="text-lg font-bold text-cyan-400">ADMIN PORTAL MBG</h1>
+          <p class="text-xs text-slate-400">Badan Gizi Nasional - Login & Upload Per Cabang</p>
         </div>
       </div>
 
