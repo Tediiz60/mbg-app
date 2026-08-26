@@ -32,12 +32,13 @@ const previewUrl = ref('')
 const isUploading = ref(false)
 const hasPublished = ref(false)
 
-// ✨ State Pop-up Notifikasi Keren Bertema SPPG
+// ✨ Pop-up Notifikasi Bertema SPPG
 const showSuccessModal = ref(false)
 const modalMessage = ref('')
 
+// ✨ URL QR Code sudah otomatis menggunakan domain baru sppg-menu-pinus.vercel.app
 const qrCodeUrl = computed(() => {
-  const targetUrl = `https://mbg-5mm6.vercel.app/detail/${activeCabang.value.slug}`
+  const targetUrl = `https://sppg-menu-pinus.vercel.app/detail/${activeCabang.value.slug}`
   return `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(targetUrl)}`
 })
 
@@ -70,7 +71,8 @@ const handleFileChange = (e: Event) => {
 
 const handlePublish = async () => {
   if (!fileInput.value?.files?.[0]) {
-    alert('Pilih foto poster dulu!')
+    modalMessage.value = 'Pilih foto poster dulu!'
+    showSuccessModal.value = true
     return
   }
 
@@ -83,7 +85,8 @@ const handlePublish = async () => {
     .upload(fileName, file)
 
   if (uploadError) {
-    alert('Gagal upload: ' + uploadError.message)
+    modalMessage.value = 'Gagal upload: ' + uploadError.message
+    showSuccessModal.value = true
     isUploading.value = false
     return
   }
@@ -104,9 +107,9 @@ const handlePublish = async () => {
   isUploading.value = false
 
   if (insertError) {
-    alert('Gagal publish: ' + insertError.message)
+    modalMessage.value = 'Gagal publish: ' + insertError.message
+    showSuccessModal.value = true
   } else {
-    // ✨ Memunculkan Modal Pop-up Keren Menggantikan Alert Bawaan Browser
     modalMessage.value = `Poster menu harian untuk ${activeCabang.value.nama} berhasil dipublish!`
     showSuccessModal.value = true
     hasPublished.value = true
@@ -129,7 +132,7 @@ const resetUpload = () => {
 <template>
   <div class="min-h-screen bg-slate-950 text-white p-6 flex justify-center items-center relative">
     
-    <!-- ✨ CUSTOM NOTIFICATION MODAL (BERTEMA SPPG) -->
+    <!-- ✨ CUSTOM NOTIFICATION MODAL -->
     <div v-if="showSuccessModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div class="w-full max-w-sm bg-slate-900 border border-cyan-500/40 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
         <div class="w-16 h-16 bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center mx-auto text-2xl border border-cyan-500/30">
@@ -200,7 +203,7 @@ const resetUpload = () => {
           <button @click="handleLogout" class="bg-red-500/20 text-red-400 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer">Keluar</button>
         </div>
 
-        <!-- ✨ FORM UPLOAD (HILANG TOTAL KETIKA SUDAH PUBLISH) -->
+        <!-- FORM UPLOAD -->
         <div v-if="!hasPublished" class="space-y-4 bg-slate-950 p-4 rounded-2xl border border-slate-800">
           <div>
             <label class="block text-xs font-bold text-emerald-400 mb-2">Upload Poster Menu Baru Hari Ini</label>
@@ -216,7 +219,7 @@ const resetUpload = () => {
           </button>
         </div>
 
-        <!-- ✨ TAMPILAN MURNI QR CODE SAJA SETELAH BERHASIL PUBLISH -->
+        <!-- TAMPILAN QR CODE -->
         <div v-else class="bg-slate-950 p-5 rounded-2xl border border-cyan-500/50 text-center space-y-4 shadow-xl">
           <div class="space-y-1">
             <p class="text-xs font-bold text-emerald-400">🎉 Poster Berhasil Dipublish!</p>
