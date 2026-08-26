@@ -43,15 +43,43 @@ onMounted(async () => {
   <div class="min-h-screen bg-slate-950 text-white p-6 flex justify-center items-center">
     <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl text-center space-y-6">
       
-      <div class="text-left border-b border-slate-800 pb-4">
-        <h1 class="text-xl font-bold text-cyan-400">{{ cabangMenu }}</h1>
-        <p class="text-xs text-slate-400">Portal Verifikasi Menu Resmi</p>
+      <!-- Header Cabang dengan Badge Resmi -->
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4 text-left">
+        <div>
+          <h1 class="text-xl font-bold text-cyan-400">{{ cabangMenu }}</h1>
+          <p class="text-xs text-slate-400">Portal Verifikasi Menu Resmi</p>
+        </div>
+        <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Terverifikasi
+        </div>
       </div>
 
-      <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 min-h-[300px] flex items-center justify-center">
-        <div v-if="isLoading" class="text-sm text-cyan-400">Memuat poster...</div>
-        <img v-else-if="imageUrl" :src="imageUrl" alt="Poster" class="w-full rounded-xl object-contain max-h-[70vh]" />
-        <div v-else class="text-sm text-slate-500 italic">Belum ada poster untuk cabang ini.</div>
+      <!-- Kotak Poster Makanan -->
+      <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 min-h-[300px] flex items-center justify-center relative overflow-hidden">
+        <div v-if="isLoading" class="text-sm text-cyan-400 flex items-center gap-2">
+          <svg class="animate-spin h-4 w-4 text-cyan-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Memuat poster...
+        </div>
+        <img v-else-if="imageUrl" :src="imageUrl" alt="Poster Menu" class="w-full rounded-xl object-contain max-h-[70vh] shadow-md" />
+        <div v-else class="text-sm text-slate-500 italic py-8">Belum ada poster menu aktif untuk cabang ini.</div>
+      </div>
+
+      <!-- Tambahan Footer/Pesan Gizi -->
+      <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 text-left space-y-1">
+        <p class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+          <span>🛡️</span> Standar Gizi & Kebersihan Terjamin
+        </p>
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          Menu harian ini telah dikurasi dan disesuaikan untuk memenuhi kebutuhan gizi seimbang siswa secara higienis dan tepat waktu.
+        </p>
+      </div>
+
+      <div class="text-[10px] text-slate-600 pt-1">
+        SPPG System &copy; 2026 &bull; All Rights Reserved
       </div>
 
     </div>
