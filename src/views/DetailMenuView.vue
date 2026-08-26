@@ -40,8 +40,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-950 text-white p-4 sm:p-6 flex justify-center items-start">
-    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl text-center space-y-6 my-auto">
+  <div class="bg-slate-950 text-white min-h-screen w-full py-6 px-4 flex flex-col items-center">
+    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
       
       <!-- Header Cabang dengan Badge Resmi -->
       <div class="flex items-center justify-between border-b border-slate-800 pb-4 text-left">
@@ -49,7 +49,7 @@ onMounted(async () => {
           <h1 class="text-xl font-bold text-cyan-400">{{ cabangMenu }}</h1>
           <p class="text-xs text-slate-400">Portal Verifikasi Menu Resmi</p>
         </div>
-        <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 font-medium">
+        <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 font-medium shrink-0">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           Terverifikasi
         </div>
@@ -64,7 +64,7 @@ onMounted(async () => {
           </svg>
           Memuat poster...
         </div>
-        <img v-else-if="imageUrl" :src="imageUrl" alt="Poster Menu" class="w-full rounded-xl object-contain max-h-[70vh] shadow-md" />
+        <img v-else-if="imageUrl" :src="imageUrl" alt="Poster Menu" class="w-full rounded-xl object-contain max-h-[75vh] shadow-md" />
         <div v-else class="text-sm text-slate-500 italic py-8">Belum ada poster menu aktif untuk cabang ini.</div>
       </div>
 
@@ -78,7 +78,7 @@ onMounted(async () => {
         </p>
       </div>
 
-      <div class="text-[10px] text-slate-600 pt-1">
+      <div class="text-[10px] text-slate-600 text-center pt-1">
         SPPG System &copy; 2026 &bull; All Rights Reserved
       </div>
 
