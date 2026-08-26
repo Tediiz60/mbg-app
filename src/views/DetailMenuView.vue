@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '../lib/supabase'
-import logoMbg from '../assets/logo-mbg.png' // Sesuaikan path jika ditaruh di folder assets
+import logoMbg from '../assets/mbg.jpg'
 
 const route = useRoute()
 const slug = (route.params.slug as string) || 'sukahaji'
@@ -46,7 +46,7 @@ onMounted(async () => {
       
       <!-- Logo & Header Cabang -->
       <div class="flex flex-col items-center text-center border-b border-slate-800 pb-5 space-y-3">
-        <img :src="logoMbg" alt="Logo Badan Gizi Nasional" class="w-20 h-20 object-contain drop-shadow-md" />
+        <img :src="logoMbg" alt="Logo Badan Gizi Nasional" class="w-20 h-20 object-contain drop-shadow-md rounded-full" />
         <div>
           <h1 class="text-xl font-bold text-cyan-400">{{ cabangMenu }}</h1>
           <p class="text-xs text-slate-400">Portal Verifikasi Menu Resmi</p>
