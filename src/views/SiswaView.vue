@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import QrGenerator from '../components/QrGenerator.vue'
 import { supabase } from '../lib/supabase'
-import logoBgn from '@/assets/sppg.webp'
+import logoMbg from '@/assets/mbg.jpg'
 
 const qrValue = ref('')
 const hasMenu = ref(false)
@@ -52,14 +52,14 @@ onMounted(() => {
 
     <div class="w-full max-w-md bg-slate-900/80 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 shadow-2xl text-center space-y-6 relative z-10 transition-all duration-300 hover:border-slate-700">
       
-      <!-- Header SPPG -->
+      <!-- Header SPPG / Badan Gizi Nasional -->
       <div class="flex items-center space-x-3 pb-4 border-b border-slate-800/80 text-left">
         <div class="relative">
           <div class="absolute inset-0 bg-cyan-500/20 rounded-full blur-md"></div>
-          <img :src="logoBgn" alt="Logo SPPG" class="w-12 h-12 object-contain relative z-10" />
+          <img :src="logoMbg" alt="Logo MBG" class="w-12 h-12 object-contain relative z-10 rounded-full" />
         </div>
         <div>
-          <h1 class="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-300">SPPG SLEMAN TIMUR</h1>
+          <h1 class="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-300">PORTAL MENU MBG</h1>
           <p class="text-[10px] tracking-wide text-slate-400 font-medium">Badan Gizi Nasional - Republik Indonesia</p>
         </div>
       </div>
