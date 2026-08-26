@@ -13,12 +13,12 @@ interface Cabang {
 }
 
 const daftarCabang: Cabang[] = [
-  { nama: 'SPPG Bandung Kutawaringin Jatisari', slug: 'kutawaringin-jatisari', password: 'sppg123' },
-  { nama: 'SPPG Bandung Soreang Soreang 3', slug: 'soreang-soreang-3', password: 'sppg123' },
-  { nama: 'SPPG Bandung Katapang Gandasari 2', slug: 'katapang-gandasari-2', password: 'sppg123' },
-  { nama: 'SPPG Kuningan Kadugede Kadugede 2', slug: 'kuningan-kadugede-2', password: 'sppg123' },
-  { nama: 'SPPG Kuningan Jalaksana Maniskidul', slug: 'jalaksana-maniskidul', password: 'sppg123' },
-  { nama: 'SPPG Bandung Barat Cihampelas Mekarmukti 2', slug: 'cihampelas-mekarmukti-2', password: 'sppg123' }
+  { nama: 'SPPG Bandung Kutawaringin Jatisari', slug: 'kutawaringin-jatisari', password: 'sppg05' },
+  { nama: 'SPPG Bandung Soreang Soreang 3', slug: 'soreang-soreang-3', password: 'sppg23' },
+  { nama: 'SPPG Bandung Katapang Gandasari 2', slug: 'katapang-gandasari-2', password: 'sppg26' },
+  { nama: 'SPPG Kuningan Kadugede Kadugede 2', slug: 'kuningan-kadugede-2', password: 'sppg02' },
+  { nama: 'SPPG Kuningan Jalaksana Maniskidul', slug: 'jalaksana-maniskidul', password: 'sppg05_' },
+  { nama: 'SPPG Bandung Barat Cihampelas Mekarmukti 2', slug: 'cihampelas-mekarmukti-2', password: 'sppg17' }
 ]
 
 const isLoggedIn = ref(false)
@@ -36,7 +36,7 @@ const showSuccessModal = ref(false)
 const modalMessage = ref('')
 
 const qrCodeUrl = computed(() => {
-  const targetUrl = `https://sppg-menu-pinus.vercel.app/detail/${activeCabang.value.slug}`
+  const targetUrl = `https://mbg-5mm6.vercel.app/detail/${activeCabang.value.slug}`
   return `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(targetUrl)}`
 })
 
