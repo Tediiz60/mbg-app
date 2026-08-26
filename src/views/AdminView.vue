@@ -96,7 +96,7 @@ const handlePublish = async () => {
   } else {
     alert('Berhasil publish poster untuk ' + activeCabang.value.nama)
     
-    // ✨ OTOMATIS PINDAH KE HALAMAN DETAIL CABANG TERSEBUT
+    // ✨ OTOMATIS PINDAH KE HALAMAN QR / DETAIL CABANG TERSEBUT
     router.push(`/detail/${activeCabang.value.slug}`)
   }
 }
