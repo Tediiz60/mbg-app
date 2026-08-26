@@ -36,7 +36,7 @@ const showSuccessModal = ref(false)
 const modalMessage = ref('')
 
 const qrCodeUrl = computed(() => {
-  const targetUrl = `https://mbg-5mm6.vercel.app/detail/${activeCabang.value.slug}`
+  const targetUrl = `https://portal-sppg-id.vercel.app/detail/${activeCabang.value.slug}`
   return `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(targetUrl)}`
 })
 
