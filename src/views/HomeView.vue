@@ -5,10 +5,15 @@ import logoMbg from '@/assets/mbg.jpg'
 
 const router = useRouter()
 
-// Status untuk modal popup password master
 const showAdminModal = ref(false)
 const masterPassword = ref('')
 const showPass = ref(false)
+
+// State untuk custom alert/modal status
+const showAlertModal = ref(false)
+const alertTitle = ref('')
+const alertMessage = ref('')
+const alertType = ref<'success' | 'error'>('success')
 
 const openAdminModal = () => {
   showAdminModal.value = true
@@ -16,12 +21,25 @@ const openAdminModal = () => {
 }
 
 const verifyMasterPassword = () => {
-  // Ganti 'adminpusat2026' dengan password master rahasia pilihan CEO / kamu
+  // Master password pusat (bisa diganti sesuai keinginan)
   if (masterPassword.value === 'adminpusat2026') {
     showAdminModal.value = false
-    router.push('/admin')
+    alertTitle.value = 'LOGIN BERHASIL!'
+    alertMessage.value = 'Selamat datang, Master Admin! Anda akan diarahkan ke panel admin.'
+    alertType.value = 'success'
+    showAlertModal.value = true
   } else {
-    alert('Master Password Admin Salah! Akses ditolak.')
+    alertTitle.value = 'GAGAL MASUK!'
+    alertMessage.value = 'Master Password yang Anda masukkan salah. Silakan coba lagi.'
+    alertType.value = 'error'
+    showAlertModal.value = true
+  }
+}
+
+const handleAlertClose = () => {
+  showAlertModal.value = false
+  if (alertType.value === 'success') {
+    router.push('/admin')
   }
 }
 
@@ -33,6 +51,30 @@ const goToSiswa = () => {
 <template>
   <div class="min-h-screen bg-slate-950 text-white flex items-center justify-center p-6 relative">
     
+    <!-- MODAL CUSTOM ALERT (BERHASIL / SALAH) -->
+    <div v-if="showAlertModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="w-full max-w-sm bg-slate-900 border rounded-3xl p-6 text-center space-y-4 shadow-2xl"
+           :class="alertType === 'success' ? 'border-emerald-500/50' : 'border-red-500/50'">
+        <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto text-2xl border"
+             :class="alertType === 'success' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30'">
+          {{ alertType === 'success' ? '🎉' : '❌' }}
+        </div>
+        <div class="space-y-1">
+          <h3 class="text-base font-extrabold" :class="alertType === 'success' ? 'text-emerald-400' : 'text-red-400'">
+            {{ alertTitle }}
+          </h3>
+          <p class="text-xs text-slate-300 leading-relaxed">{{ alertMessage }}</p>
+        </div>
+        <button 
+          @click="handleAlertClose"
+          class="w-full font-bold py-3 rounded-xl text-xs cursor-pointer transition shadow-lg text-slate-950"
+          :class="alertType === 'success' ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-red-500 hover:bg-red-400'"
+        >
+          OK, MENGERTI
+        </button>
+      </div>
+    </div>
+
     <!-- MODAL POPUP MASTER PASSWORD ADMIN -->
     <div v-if="showAdminModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div class="w-full max-w-sm bg-slate-900 border border-cyan-500/40 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
