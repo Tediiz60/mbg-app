@@ -5,15 +5,15 @@ import { supabase } from '../lib/supabase'
 import logoMbg from '../assets/mbg.jpg'
 
 const route = useRoute()
-const slug = (route.params.slug as string) || 'sukahaji'
+const slug = (route.params.slug as string) || 'kutawaringin-jatisari'
 
 const mappingCabang: Record<string, string> = {
-  'sleman-timur': 'SPPG Sleman Timur',
-  'djati-pasundan': 'SPPG Djati Pasundan',
-  'cihampelas': 'SPPG Cihampelas',
-  'katapang': 'SPPG Katapang',
-  'sukahaji': 'SPPG Sukahaji',
-  'bandung-berkah': 'SPPG Bandung Berkah'
+  'kutawaringin-jatisari': 'SPPG Bandung Kutawaringin Jatisari',
+  'soreang-soreang-3': 'SPPG Bandung Soreang Soreang 3',
+  'katapang-gandasari-2': 'SPPG Bandung Katapang Gandasari 2',
+  'kuningan-kadugede-2': 'SPPG Kuningan Kadugede Kadugede 2',
+  'jalaksana-maniskidul': 'SPPG Kuningan Jalaksana Maniskidul',
+  'cihampelas-mekarmukti-2': 'SPPG Bandung Barat Cihampelas Mekarmukti 2'
 }
 
 const cabangMenu = ref(mappingCabang[slug] || 'SPPG Cabang')
