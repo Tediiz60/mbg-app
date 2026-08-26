@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { supabase } from '../lib/supabase'
 import logoBgn from '@/assets/sppg.webp'
+
+const router = useRouter()
 
 interface Cabang {
   nama: string
@@ -21,7 +24,7 @@ const daftarCabang: Cabang[] = [
 const isLoggedIn = ref(false)
 const inputCabangNama = ref('SPPG Sleman Timur')
 const inputPassword = ref('')
-const showPassword = ref(false) // State untuk fitur lihat password
+const showPassword = ref(false)
 const activeCabang = ref<Cabang>(daftarCabang[0]!)
 
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -92,8 +95,9 @@ const handlePublish = async () => {
     alert('Gagal publish: ' + insertError.message)
   } else {
     alert('Berhasil publish poster untuk ' + activeCabang.value.nama)
-    previewUrl.value = ''
-    if (fileInput.value) fileInput.value.value = ''
+    
+    // ✨ OTOMATIS PINDAH KE HALAMAN DETAIL CABANG TERSEBUT
+    router.push(`/detail/${activeCabang.value.slug}`)
   }
 }
 </script>
@@ -118,7 +122,6 @@ const handlePublish = async () => {
           </select>
         </div>
 
-        <!-- Input Password dengan Tombol Mata -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Password</label>
           <div class="relative">
