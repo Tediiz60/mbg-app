@@ -21,6 +21,7 @@ const daftarCabang: Cabang[] = [
 const isLoggedIn = ref(false)
 const inputCabangNama = ref('SPPG Sleman Timur')
 const inputPassword = ref('')
+const showPassword = ref(false) // State untuk fitur lihat password
 const activeCabang = ref<Cabang>(daftarCabang[0]!)
 
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -33,6 +34,7 @@ const handleLogin = () => {
     isLoggedIn.value = true
     activeCabang.value = found
     inputPassword.value = ''
+    showPassword.value = false
   } else {
     alert('Password cabang salah!')
   }
@@ -116,12 +118,28 @@ const handlePublish = async () => {
           </select>
         </div>
 
+        <!-- Input Password dengan Tombol Mata -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Password</label>
-          <input v-model="inputPassword" type="password" placeholder="Password cabang..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm" @keyup.enter="handleLogin" />
+          <div class="relative">
+            <input 
+              v-model="inputPassword" 
+              :type="showPassword ? 'text' : 'password'" 
+              placeholder="Password cabang..." 
+              class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 pr-12 text-sm focus:outline-none focus:border-cyan-500" 
+              @keyup.enter="handleLogin" 
+            />
+            <button 
+              type="button" 
+              @click="showPassword = !showPassword" 
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-400 text-xs font-bold px-2 py-1 cursor-pointer select-none"
+            >
+              {{ showPassword ? '🙈 Sembunyikan' : '👁️ Lihat' }}
+            </button>
+          </div>
         </div>
 
-        <button @click="handleLogin" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3 rounded-xl text-sm cursor-pointer">
+        <button @click="handleLogin" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3 rounded-xl text-sm cursor-pointer transition">
           MASUK PANEL
         </button>
       </div>
