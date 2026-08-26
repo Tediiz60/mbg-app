@@ -41,8 +41,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="bg-slate-950 text-white min-h-screen w-full py-6 px-4 flex flex-col items-center">
-    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
+  <div class="bg-slate-950 text-white min-h-screen w-full py-8 px-4 flex justify-center overflow-y-auto">
+    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 my-auto">
       
       <!-- Logo & Header Cabang -->
       <div class="flex flex-col items-center text-center border-b border-slate-800 pb-5 space-y-3">
@@ -80,7 +80,7 @@ onMounted(async () => {
         </p>
       </div>
 
-      <div class="text-[10px] text-slate-600 text-center pt-1">
+      <div class="text-[10px] text-slate-600 text-center pt-1 pb-2">
         SPPG System &copy; 2026 &bull; All Rights Reserved
       </div>
 
