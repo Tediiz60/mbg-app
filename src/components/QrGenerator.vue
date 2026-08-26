@@ -1,85 +1,50 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import QRCode from 'qrcode'
+import { ref, computed } from 'vue'
+import QrcodeVue from 'qrcode.vue'
 
-const daftarCabang = [
-  { nama: 'SPPG Sleman Timur', slug: 'sleman-timur' },
-  { nama: 'SPPG Djati Pasundan', slug: 'djati-pasundan' },
-  { nama: 'SPPG Cihampelas', slug: 'cihampelas' },
-  { nama: 'SPPG Katapang', slug: 'katapang' },
-  { nama: 'SPPG Sukahaji', slug: 'sukahaji' },
-  { nama: 'SPPG Bandung Berkah', slug: 'bandung-berkah' }
+interface Cabang {
+  nama: string
+  slug: string
+}
+
+const daftarCabang: Cabang[] = [
+  { nama: 'SPPG Bandung Kutawaringin Jatisari', slug: 'kutawaringin-jatisari' },
+  { nama: 'SPPG Bandung Soreang Soreang 3', slug: 'soreang-soreang-3' },
+  { nama: 'SPPG Bandung Katapang Gandasari 2', slug: 'katapang-gandasari-2' },
+  { nama: 'SPPG Kuningan Kadugede Kadugede 2', slug: 'kuningan-kadugede-2' },
+  { nama: 'SPPG Kuningan Jalaksana Maniskidul', slug: 'jalaksana-maniskidul' },
+  { nama: 'SPPG Bandung Barat Cihampelas Mekarmukti 2', slug: 'cihampelas-mekarmukti-2' }
 ]
 
-const selectedCabangSlug = ref('katapang')
-const qrCodeDataUrl = ref('')
+const selectedCabang = ref(daftarCabang[0]?.slug || 'kutawaringin-jatisari')
 
-const baseUrl = window.location.origin
-const targetLink = computed(() => `${baseUrl}/detail/${selectedCabangSlug.value}`)
-
-const generateQR = async () => {
-  try {
-    qrCodeDataUrl.value = await QRCode.toDataURL(targetLink.value, {
-      width: 300,
-      margin: 2,
-      color: {
-        dark: '#0f172a',
-        light: '#ffffff'
-      }
-    })
-  } catch (err) {
-    console.error('Gagal generate QR Code:', err)
-  }
-}
-
-watch(selectedCabangSlug, () => {
-  generateQR()
-}, { immediate: true })
-
-const downloadQR = () => {
-  const link = document.createElement('a')
-  link.href = qrCodeDataUrl.value
-  link.download = `QRCode-MBG-${selectedCabangSlug.value}.png`
-  link.click()
-}
+const qrCodeUrl = computed(() => {
+  const targetUrl = `${window.location.origin}/detail/${selectedCabang.value}`
+  return targetUrl
+})
 </script>
 
 <template>
-  <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 text-white max-w-md mx-auto my-6">
-    
-    <div class="border-b border-slate-800 pb-4">
-      <h2 class="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-300">
-        Generator 6 QR Code Cabang SPPG
-      </h2>
-      <p class="text-xs text-slate-400 mt-1">Pilih cabang untuk mendownload QR Code unik wilayah tersebut.</p>
+  <div class="w-full max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
+    <div class="space-y-1">
+      <h2 class="text-base font-bold text-cyan-400">Generator QR Code Cabang SPPG</h2>
+      <p class="text-xs text-slate-400">Pilih wilayah cabang untuk melihat/download QR Code:</p>
     </div>
 
-    <div class="space-y-2">
-      <label class="block text-xs font-bold text-cyan-400 uppercase tracking-wider">📍 Pilih Wilayah Cabang</label>
-      <select 
-        v-model="selectedCabangSlug"
-        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 cursor-pointer shadow-inner"
-      >
+    <div>
+      <label class="block text-[11px] text-slate-400 mb-1 text-left font-medium">📍 Pilih Wilayah Cabang</label>
+      <select v-model="selectedCabang" class="w-full bg-slate-950 border border-slate-800 text-white rounded-xl p-3 text-xs cursor-pointer focus:outline-none focus:border-cyan-500">
         <option v-for="c in daftarCabang" :key="c.slug" :value="c.slug">{{ c.nama }}</option>
       </select>
     </div>
 
-    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/80 text-xs space-y-1">
-      <span class="text-slate-400 font-medium">Link Tujuan QR:</span>
-      <p class="text-cyan-300 font-mono text-[11px] break-all select-all">{{ targetLink }}</p>
+    <div class="bg-white p-4 rounded-2xl inline-block shadow-lg">
+      <QrcodeVue :value="qrCodeUrl" :size="180" level="H" />
     </div>
 
-    <div class="flex flex-col items-center justify-center bg-white p-4 rounded-2xl shadow-inner space-y-3">
-      <img v-if="qrCodeDataUrl" :src="qrCodeDataUrl" alt="QR Code Cabang" class="w-48 h-48 object-contain" />
-      <span class="text-[11px] font-bold text-slate-800 uppercase tracking-tight">QR Code Resmi MBG SPPG</span>
+    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+      <p class="text-[10px] text-slate-400 mb-0.5">Link Tujuan QR:</p>
+      <p class="text-[11px] text-cyan-300 font-mono break-all">{{ qrCodeUrl }}</p>
     </div>
-
-    <button 
-      @click="downloadQR"
-      class="w-full bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold py-3 rounded-xl transition duration-200 text-sm shadow-lg shadow-cyan-500/20 cursor-pointer flex items-center justify-center space-x-2"
-    >
-      <span>📥 DOWNLOAD QR CODE INI</span>
-    </button>
-
   </div>
 </template>
