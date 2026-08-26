@@ -21,8 +21,8 @@ const router = createRouter({
       component: SiswaView
     },
     {
-      path: '/detail',
-      name: 'detail',
+      path: '/detail/:slug',
+      name: 'detail-menu',
       component: DetailMenuView
     }
   ]
