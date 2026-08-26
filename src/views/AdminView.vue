@@ -35,6 +35,15 @@ const hasPublished = ref(false)
 const showSuccessModal = ref(false)
 const modalMessage = ref('')
 
+// Salam hangat otomatis berdasarkan waktu komputer
+const salamWaktu = computed(() => {
+  const jam = new Date().getHours()
+  if (jam < 11) return 'Selamat Pagi 🌅'
+  if (jam < 15) return 'Selamat Siang ☀️'
+  if (jam < 18) return 'Selamat Sore 🌇'
+  return 'Selamat Malam 🌙'
+})
+
 const qrCodeUrl = computed(() => {
   const targetUrl = `https://portal-sppg-id.vercel.app/detail/${activeCabang.value.slug}`
   return `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(targetUrl)}`
@@ -155,8 +164,8 @@ const resetUpload = () => {
       <div class="flex items-center space-x-3 pb-4 border-b border-slate-800">
         <img :src="logoMbg" alt="Logo MBG" class="w-12 h-12 object-contain rounded-full" />
         <div>
-          <h1 class="text-lg font-bold text-cyan-400">ADMIN PORTAL MBG</h1>
-          <p class="text-xs text-slate-400">Badan Gizi Nasional - Login & Upload Per Cabang</p>
+          <h1 class="text-lg font-bold text-cyan-400">ADMIN PANEL MBG</h1>
+          <p class="text-xs text-slate-400">Badan Gizi Nasional - Sesi Pengelolaan Cabang</p>
         </div>
       </div>
 
@@ -194,12 +203,13 @@ const resetUpload = () => {
       </div>
 
       <div v-else class="space-y-4">
-        <div class="flex justify-between items-center bg-cyan-950/40 p-3 rounded-xl border border-cyan-800">
-          <div>
-            <p class="text-[10px] text-cyan-300">Aktif:</p>
-            <p class="text-sm font-bold">{{ activeCabang.nama }}</p>
+        <!-- SALAM HANGAT OTOMATIS -->
+        <div class="flex justify-between items-center bg-cyan-950/40 p-4 rounded-2xl border border-cyan-800/80 shadow-md">
+          <div class="space-y-0.5">
+            <p class="text-[11px] font-bold text-cyan-300">👋 {{ salamWaktu }}, Admin!</p>
+            <p class="text-xs font-extrabold text-white">{{ activeCabang.nama }}</p>
           </div>
-          <button @click="handleLogout" class="bg-red-500/20 text-red-400 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer">Keluar</button>
+          <button @click="handleLogout" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition border border-red-500/30">Keluar</button>
         </div>
 
         <!-- FORM UPLOAD -->
@@ -213,7 +223,7 @@ const resetUpload = () => {
             <img :src="previewUrl" alt="Preview" class="w-full max-h-60 object-contain rounded-xl border border-slate-800" />
           </div>
 
-          <button @click="handlePublish" :disabled="isUploading" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3 rounded-xl text-sm cursor-pointer disabled:opacity-50">
+          <button @click="handlePublish" :disabled="isUploading" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3 rounded-xl text-sm cursor-pointer disabled:opacity-50 transition shadow-lg">
             {{ isUploading ? 'MENYIMPAN...' : 'PUBLISH POSTER' }}
           </button>
         </div>
