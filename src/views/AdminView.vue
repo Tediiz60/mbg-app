@@ -3,8 +3,17 @@ import { ref } from 'vue'
 import { supabase } from '../lib/supabase'
 import logoBgn from '@/assets/sppg.webp'
 
-const namaMenu = ref('')
-const nutrisiValue = ref('')
+// 6 Pilihan Cabang SPPG
+const daftarCabang = [
+  'SPPG Sleman Timur',
+  'SPPG Djati Pasundan',
+  'SPPG Cihampelas',
+  'SPPG Katapang',
+  'SPPG Sukahaji',
+  'SPPG Bandung Berkah'
+]
+
+const selectedCabang = ref(daftarCabang[0])
 const fileInput = ref<HTMLInputElement | null>(null)
 const previewUrl = ref('')
 const isUploading = ref(false)
@@ -18,8 +27,8 @@ const handleFileChange = (e: Event) => {
 }
 
 const handlePublish = async () => {
-  if (!fileInput.value?.files?.[0] || !namaMenu.value || !nutrisiValue.value) {
-    alert('Mohon isi nama menu, rincian gizi, dan pilih foto terlebih dahulu!')
+  if (!fileInput.value?.files?.[0] || !selectedCabang.value) {
+    alert('Mohon pilih cabang SPPG dan upload foto poster menu terlebih dahulu!')
     return
   }
 
@@ -27,6 +36,7 @@ const handlePublish = async () => {
   const file = fileInput.value.files[0]
   const fileName = `${Date.now()}-${file.name}`
 
+  // 1. Upload foto poster ke Supabase Storage
   const { error: uploadError } = await supabase.storage
     .from('menu-images')
     .upload(fileName, file)
@@ -37,16 +47,17 @@ const handlePublish = async () => {
     return
   }
 
+  // 2. Ambil Public URL foto
   const { data: publicUrlData } = supabase.storage
     .from('menu-images')
     .getPublicUrl(fileName)
 
+  // 3. Simpan data ke tabel menu
   const { error: insertError } = await supabase
     .from('menu')
     .insert([
       {
-        nama: namaMenu.value,
-        nutrisi: nutrisiValue.value,
+        cabang: selectedCabang.value,
         image_url: publicUrlData.publicUrl
       }
     ])
@@ -56,14 +67,12 @@ const handlePublish = async () => {
   if (insertError) {
     alert('Gagal mempublish menu: ' + insertError.message)
   } else {
-    alert('Berhasil! Menu & QR Code otomatis terupdate untuk semua siswa secara real-time.')
+    alert('Berhasil! Poster menu untuk ' + selectedCabang.value + ' berhasil dipublish secara real-time.')
     handleClear()
   }
 }
 
 const handleClear = () => {
-  namaMenu.value = ''
-  nutrisiValue.value = ''
   previewUrl.value = ''
   if (fileInput.value) {
     fileInput.value.value = ''
@@ -72,13 +81,13 @@ const handleClear = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-950 text-white p-4 flex justify-center items-center relative overflow-hidden">
+  <div class="min-h-screen bg-slate-950 text-white p-4 sm:p-6 flex justify-center items-center relative overflow-y-auto">
     
     <!-- Background Glow Ornaments -->
     <div class="absolute -top-32 -right-32 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -bottom-32 -left-32 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-    <div class="w-full max-w-lg bg-slate-900/80 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 shadow-2xl space-y-6 relative z-10 transition-all duration-300 hover:border-slate-700">
+    <div class="w-full max-w-lg bg-slate-900/80 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-6 shadow-2xl space-y-6 relative z-10 my-8">
       
       <!-- Header Admin -->
       <div class="flex items-center space-x-3 pb-4 border-b border-slate-800/80">
@@ -88,33 +97,27 @@ const handleClear = () => {
         </div>
         <div>
           <h1 class="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-300">ADMIN PORTAL SPPG</h1>
-          <p class="text-[10px] tracking-wide text-slate-400 font-medium">Input Menu & Foto (Sinkron Cloud Real-Time)</p>
+          <p class="text-[10px] tracking-wide text-slate-400 font-medium">Upload Poster Gizi & Pilih Cabang</p>
         </div>
       </div>
 
-      <div class="space-y-4">
+      <div class="space-y-5">
+        <!-- Pilihan Cabang SPPG -->
         <div>
-          <label class="block text-xs font-bold text-cyan-400 uppercase mb-1.5 tracking-wider">🍽️ Nama Menu Makanan</label>
-          <input 
-            v-model="namaMenu" 
-            type="text" 
-            placeholder="Contoh: Nasi Ayam Bergizi..." 
-            class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 shadow-inner transition-all duration-200"
-          />
+          <label class="block text-xs font-bold text-cyan-400 uppercase mb-2 tracking-wider">🏢 Pilih Cabang SPPG</label>
+          <select 
+            v-model="selectedCabang"
+            class="w-full bg-slate-950/90 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 shadow-inner cursor-pointer"
+          >
+            <option v-for="cabang in daftarCabang" :key="cabang" :value="cabang">
+              {{ cabang }}
+            </option>
+          </select>
         </div>
 
+        <!-- Upload Foto Poster -->
         <div>
-          <label class="block text-xs font-bold text-emerald-400 uppercase mb-1.5 tracking-wider">🥗 Detail Nutrisi & Gizi</label>
-          <textarea 
-            v-model="nutrisiValue" 
-            rows="3" 
-            placeholder="Contoh: Kalori: 450 kcal, Protein: 25g..." 
-            class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 shadow-inner transition-all duration-200 resize-none"
-          ></textarea>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-teal-400 uppercase mb-1.5 tracking-wider">📷 Upload Foto Hasil Editan</label>
+          <label class="block text-xs font-bold text-emerald-400 uppercase mb-2 tracking-wider">🖼️ Upload Foto Poster Menu (Lengkap Analisa Gizi)</label>
           <input 
             ref="fileInput" 
             type="file" 
@@ -124,20 +127,22 @@ const handleClear = () => {
           />
         </div>
 
+        <!-- Preview Poster -->
         <div v-if="previewUrl" class="space-y-1.5">
-          <p class="text-xs font-medium text-slate-400">Preview Foto:</p>
-          <div class="bg-slate-950 p-2 rounded-2xl border border-slate-800">
-            <img :src="previewUrl" alt="Preview" class="w-full h-48 object-cover rounded-xl shadow-md" />
+          <p class="text-xs font-medium text-slate-400">Preview Poster:</p>
+          <div class="bg-slate-950 p-2 rounded-2xl border border-slate-800 max-h-80 overflow-y-auto">
+            <img :src="previewUrl" alt="Preview Poster" class="w-full object-contain rounded-xl shadow-md" />
           </div>
         </div>
 
+        <!-- Tombol Aksi -->
         <div class="flex space-x-3 pt-3">
           <button 
             @click="handlePublish" 
             :disabled="isUploading"
             class="flex-1 bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold py-3 rounded-xl transition duration-200 text-sm shadow-lg shadow-cyan-500/20 disabled:opacity-50 cursor-pointer"
           >
-            {{ isUploading ? 'MENYIMPAN...' : '⚡ PUBLISH MENU' }}
+            {{ isUploading ? 'MENYIMPAN...' : '⚡ PUBLISH POSTER' }}
           </button>
           <button 
             @click="handleClear" 
