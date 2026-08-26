@@ -41,8 +41,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- Diubah agar mulai dari atas (justify-start) dan ada jarak padding vertikal (py-10) supaya bisa di-scroll -->
-  <div class="bg-slate-950 text-white min-h-screen w-full py-10 px-4 flex flex-col items-center justify-start overflow-y-auto">
+  <div class="bg-slate-950 text-white min-h-screen w-full py-12 px-4 flex flex-col items-center justify-start overflow-y-auto">
     <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
       
       <!-- Logo & Header Cabang -->
