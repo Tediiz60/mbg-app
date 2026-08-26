@@ -40,8 +40,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-950 text-white p-6 flex justify-center items-center">
-    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl text-center space-y-6">
+  <div class="min-h-screen bg-slate-950 text-white p-4 sm:p-6 flex justify-center items-start">
+    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl text-center space-y-6 my-auto">
       
       <!-- Header Cabang dengan Badge Resmi -->
       <div class="flex items-center justify-between border-b border-slate-800 pb-4 text-left">
