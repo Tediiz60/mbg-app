@@ -17,20 +17,23 @@ const mappingCabang: Record<string, string> = {
   'cihampelas-mekarmukti-2': 'SPPG Bandung Barat Cihampelas Mekarmukti 2'
 }
 
-// Pemetaan Link Instagram khusus untuk masing-masing cabang
+// Pemetaan Link Instagram Lengkap untuk Masing-Masing Cabang
 const mappingInstagram: Record<string, string> = {
   'kutawaringin-jatisari': 'https://instagram.com/sppgjatisari_kutawaringin',
   'soreang-soreang-3': 'https://instagram.com/sppg_bandung_soreang3',
-  'katapang-gandasari-2': 'https://instagram.com/sppg_katapang_gandasari',
-  'kuningan-kadugede-2': 'https://instagram.com/sppg_kuningan_kadugede',
-  'jalaksana-maniskidul': 'https://instagram.com/sppg_jalaksana_maniskidul',
-  'cihampelas-mekarmukti-2': 'https://instagram.com/sppg_cihampelas_mekarmukti'
+  'katapang-gandasari-2': 'https://www.instagram.com/sppg.bandunggandasari02',
+  'kuningan-kadugede-2': 'https://www.instagram.com/sppgpatra_kadugede',
+  'jalaksana-maniskidul': 'https://www.instagram.com/sppgpatra.maniskidul'
 }
 
 const cabangMenu = ref(mappingCabang[slug] || 'SPPG Cabang')
-const instagramUrl = ref(mappingInstagram[slug] || 'https://instagram.com')
 const imageUrl = ref('')
 const isLoading = ref(true)
+
+// Cek apakah cabang saat ini memiliki link Instagram
+const instagramUrl = computed(() => {
+  return mappingInstagram[slug] || ''
+})
 
 // Pengecekan cabang Cihampelas (logo yayasan disembunyikan khusus cihampelas)
 const isNotCihampelas = computed(() => {
@@ -71,11 +74,12 @@ onMounted(async () => {
 <template>
   <div class="bg-slate-950 text-white min-h-screen w-full py-8 px-4 flex flex-col items-center justify-start overflow-y-auto [-webkit-overflow-scrolling:touch]">
     
-    <!-- Kontainer Utama dengan Tombol IG di Pojok Kanan Atas -->
+    <!-- Kontainer Utama -->
     <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 mb-20 pb-44 relative">
       
-      <!-- TOMBOL IKON INSTAGRAM DI POJOK KANAN ATAS -->
+      <!-- TOMBOL IKON INSTAGRAM (Otomatis muncul sesuai cabang masing-masing) -->
       <a 
+        v-if="instagramUrl"
         :href="instagramUrl" 
         target="_blank" 
         rel="noopener noreferrer"
