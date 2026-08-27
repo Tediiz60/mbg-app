@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '../lib/supabase'
 import logoMbg from '../assets/mbg.jpg'
+// Menggunakan nama file yayasan.jpeg sesuai komputermu
+import logoYayasan from '../assets/yayasan.jpeg'
 
 const route = useRoute()
 const slug = (route.params.slug as string) || 'kutawaringin-jatisari'
@@ -19,6 +21,22 @@ const mappingCabang: Record<string, string> = {
 const cabangMenu = ref(mappingCabang[slug] || 'SPPG Cabang')
 const imageUrl = ref('')
 const isLoading = ref(true)
+
+// Pengecekan cabang Cihampelas
+const isNotCihampelas = computed(() => {
+  return slug !== 'cihampelas-mekarmukti-2'
+})
+
+// Format Tanggal Hari Ini secara Otomatis dalam Bahasa Indonesia
+const tanggalHariIni = computed(() => {
+  const options: Intl.DateTimeFormatOptions = { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  }
+  return new Date().toLocaleDateString('id-ID', options)
+})
 
 onMounted(async () => {
   try {
@@ -41,16 +59,32 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="bg-slate-950 text-white min-h-screen w-full py-12 px-4 flex flex-col items-center justify-start overflow-y-auto">
-    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
+  <div class="bg-slate-950 text-white min-h-full w-full py-12 px-4 flex flex-col items-center justify-start overflow-y-auto [-webkit-overflow-scrolling:touch]">
+    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 pb-24">
       
       <!-- Logo & Header Cabang -->
       <div class="flex flex-col items-center text-center border-b border-slate-800 pb-5 space-y-3">
-        <img :src="logoMbg" alt="Logo Badan Gizi Nasional" class="w-20 h-20 object-contain drop-shadow-md rounded-full bg-white p-1" />
+        
+        <!-- BAGIAN DUA LOGO BERBENTUK BULAT -->
+        <div class="flex items-center justify-center gap-3">
+          <!-- Logo MBG Utama -->
+          <img :src="logoMbg" alt="Logo Badan Gizi Nasional" class="w-20 h-20 object-contain drop-shadow-md rounded-full bg-white p-1 border border-slate-700 shadow-lg" />
+          
+          <!-- Logo Yayasan Patra (Bentuk Bulat, KECUALI Cihampelas) -->
+          <img v-if="isNotCihampelas" :src="logoYayasan" alt="Logo Yayasan Patra Nusantara Sakti" class="w-20 h-20 object-cover drop-shadow-md rounded-full bg-slate-900 border-2 border-amber-500/70 shadow-amber-500/20 shadow-lg" />
+        </div>
+
         <div>
           <h1 class="text-xl font-bold text-cyan-400">{{ cabangMenu }}</h1>
           <p class="text-xs text-slate-400">Portal Verifikasi Menu Resmi</p>
         </div>
+
+        <!-- KOTAK TANGGAL OTOMATIS -->
+        <div class="bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 text-xs px-4 py-1.5 rounded-full flex items-center gap-2 font-bold shadow-sm">
+          <span>📅</span> 
+          <span>Menu Harian: {{ tanggalHariIni }}</span>
+        </div>
+
         <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 font-medium">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           Terverifikasi
