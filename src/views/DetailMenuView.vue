@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '../lib/supabase'
 import logoMbg from '../assets/mbg.jpg'
@@ -19,6 +19,17 @@ const mappingCabang: Record<string, string> = {
 const cabangMenu = ref(mappingCabang[slug] || 'SPPG Cabang')
 const imageUrl = ref('')
 const isLoading = ref(true)
+
+// Format Tanggal Hari Ini secara Otomatis dalam Bahasa Indonesia
+const tanggalHariIni = computed(() => {
+  const options: Intl.DateTimeFormatOptions = { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  }
+  return new Date().toLocaleDateString('id-ID', options)
+})
 
 onMounted(async () => {
   try {
@@ -41,8 +52,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="bg-slate-950 text-white min-h-screen w-full py-12 px-4 flex flex-col items-center justify-start overflow-y-auto">
-    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
+  <!-- min-h-full dan overflow-y-auto agar bisa di-scroll sampai bawah dan tidak terpotong -->
+  <div class="bg-slate-950 text-white min-h-full w-full py-12 px-4 flex flex-col items-center justify-start overflow-y-auto [-webkit-overflow-scrolling:touch]">
+    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 pb-24">
       
       <!-- Logo & Header Cabang -->
       <div class="flex flex-col items-center text-center border-b border-slate-800 pb-5 space-y-3">
@@ -51,6 +63,13 @@ onMounted(async () => {
           <h1 class="text-xl font-bold text-cyan-400">{{ cabangMenu }}</h1>
           <p class="text-xs text-slate-400">Portal Verifikasi Menu Resmi</p>
         </div>
+
+        <!-- KOTAK TANGGAL OTOMATIS (Sesuai permintaan) -->
+        <div class="bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 text-xs px-4 py-1.5 rounded-full flex items-center gap-2 font-bold shadow-sm">
+          <span>📅</span> 
+          <span>Menu Harian: {{ tanggalHariIni }}</span>
+        </div>
+
         <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 font-medium">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           Terverifikasi
