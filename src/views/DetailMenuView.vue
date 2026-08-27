@@ -3,7 +3,6 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '../lib/supabase'
 import logoMbg from '../assets/mbg.jpg'
-// Menggunakan nama file yayasan.jpeg sesuai komputermu
 import logoYayasan from '../assets/yayasan.jpeg'
 
 const route = useRoute()
@@ -59,8 +58,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="bg-slate-950 text-white min-h-full w-full py-12 px-4 flex flex-col items-center justify-start overflow-y-auto [-webkit-overflow-scrolling:touch]">
-    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 pb-24">
+  <div class="bg-slate-950 text-white min-h-screen w-full py-8 px-4 flex flex-col items-center justify-start overflow-y-auto [-webkit-overflow-scrolling:touch]">
+    
+    <!-- pb-44 memberikan ruang kosong yang sangat lega di bawah agar bisa di-scroll dengan sempurna tanpa terpotong -->
+    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 mb-20 pb-44">
       
       <!-- Logo & Header Cabang -->
       <div class="flex flex-col items-center text-center border-b border-slate-800 pb-5 space-y-3">
@@ -92,15 +93,15 @@ onMounted(async () => {
       </div>
 
       <!-- Kotak Poster Makanan -->
-      <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 min-h-[300px] flex items-center justify-center relative overflow-hidden">
-        <div v-if="isLoading" class="text-sm text-cyan-400 flex items-center gap-2">
+      <div class="bg-slate-950 p-2 sm:p-4 rounded-2xl border border-slate-800 w-full flex flex-col items-center justify-center">
+        <div v-if="isLoading" class="text-sm text-cyan-400 flex items-center gap-2 py-12">
           <svg class="animate-spin h-4 w-4 text-cyan-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
           Memuat poster...
         </div>
-        <img v-else-if="imageUrl" :src="imageUrl" alt="Poster Menu" class="w-full rounded-xl object-contain shadow-md" />
+        <img v-else-if="imageUrl" :src="imageUrl" alt="Poster Menu" class="w-full h-auto rounded-xl object-contain shadow-md" />
         <div v-else class="text-sm text-slate-500 italic py-8">Belum ada poster menu aktif untuk cabang ini.</div>
       </div>
 
