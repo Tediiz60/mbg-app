@@ -18,6 +18,9 @@ const alertTitle = ref('')
 const alertMessage = ref('')
 const alertType = ref<'success' | 'error'>('success')
 
+// State khusus Modal Keluar Sesi (Langkah 9 Panduan)
+const showLogoutModal = ref(false)
+
 const triggerAlert = (title: string, message: string, type: 'success' | 'error') => {
   alertTitle.value = title
   alertMessage.value = message
@@ -89,11 +92,14 @@ const handleLogin = () => {
   }
 }
 
+// FUNGSI KELUAR / LOGOUT SESUAI LANGKAH 9
 const handleLogout = () => {
   isLoggedIn.value = false
   previewUrl.value = ''
   hasPublished.value = false
   if (fileInput.value) fileInput.value.value = ''
+  // Munculkan popup sukses keluar sesi
+  showLogoutModal.value = true
 }
 
 const handleFileChange = (e: Event) => {
@@ -184,6 +190,28 @@ const resetUpload = () => {
           :class="alertType === 'success' ? 'bg-cyan-500 hover:bg-cyan-400 text-slate-950' : 'bg-red-500 hover:bg-red-400 text-white'"
         >
           MENGERTI / LANJUTKAN
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL POPUP KELUAR / LOGOUT SESUAI LANGKAH 9 -->
+    <div v-if="showLogoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div class="w-full max-w-sm bg-slate-900 border border-emerald-500/40 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
+        
+        <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto text-2xl shadow-inner">
+          ✅
+        </div>
+
+        <div class="space-y-1">
+          <h3 class="text-base font-extrabold tracking-wide text-emerald-400">Sampai jumpa!</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">Anda telah keluar dari sesi.</p>
+        </div>
+
+        <button 
+          @click="showLogoutModal = false"
+          class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold py-3 rounded-xl text-xs cursor-pointer transition shadow-lg"
+        >
+          OK
         </button>
       </div>
     </div>
