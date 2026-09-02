@@ -26,14 +26,14 @@ const mappingInstagram: Record<string, string> = {
   'jalaksana-maniskidul': 'https://www.instagram.com/sppgpatra.maniskidul'
 }
 
-// Pemetaan Link TikTok Resmi Berdasarkan Cabang
+// Pemetaan Link TikTok Sesuai Ralat Detail WhatsApp Kantor
 const mappingTiktok: Record<string, string> = {
-  'kutawaringin-jatisari': 'https://www.tiktok.com/@sppg_jatisari',
+  'kutawaringin-jatisari': 'https://www.tiktok.com/@sppg.djatipasundan',
+  'cihampelas-mekarmukti-2': 'https://www.tiktok.com/@sppg.djatipasundan',
+  'kuningan-kadugede-2': 'https://www.tiktok.com/@sppgpatra_kadugede',
   'soreang-soreang-3': 'https://www.tiktok.com/@sppgbandungsoreang3',
   'katapang-gandasari-2': 'https://www.tiktok.com/@sppg.gandasari.02',
-  'kuningan-kadugede-2': 'https://www.tiktok.com/@sppgpatra_kadugede',
-  'jalaksana-maniskidul': 'https://www.tiktok.com/@sppg.jalaksana',
-  'cihampelas-mekarmukti-2': 'https://www.tiktok.com/@sppg.cihampelas'
+  'jalaksana-maniskidul': 'https://www.tiktok.com/@sppgpatramaniskidul3'
 }
 
 const cabangMenu = ref(mappingCabang[slug] || 'SPPG Cabang')
