@@ -40,6 +40,11 @@ const cabangMenu = ref(mappingCabang[slug] || 'SPPG Cabang')
 const imageUrl = ref('')
 const isLoading = ref(true)
 
+// State untuk Fitur Arsip / Riwayat Menu
+const riwayatMenu = ref<any[]>([])
+const selectedTanggal = ref('')
+const showModalArsip = ref(false)
+
 // Cek apakah cabang saat ini memiliki link Instagram / TikTok
 const instagramUrl = computed(() => {
   return mappingInstagram[slug] || ''
@@ -65,23 +70,39 @@ const tanggalHariIni = computed(() => {
   return new Date().toLocaleDateString('id-ID', options)
 })
 
-onMounted(async () => {
+// Fungsi untuk mengambil daftar arsip menu berdasarkan cabang
+const ambilArsipMenu = async () => {
   try {
     const { data } = await supabase
       .from('menu')
       .select('*')
       .eq('cabang', cabangMenu.value)
-      .order('id', { ascending: false })
-      .limit(1)
+      .order('created_at', { ascending: false })
+      .limit(10) // Ambil 10 riwayat menu terakhir
 
     if (data && data.length > 0) {
+      riwayatMenu.value = data
+      // Set default gambar ke menu terbaru (hari ini)
       imageUrl.value = data[0].image_url
     }
   } catch (err) {
-    console.error(err)
+    console.error('Gagal memuat arsip:', err)
   } finally {
     isLoading.value = false
   }
+}
+
+// Fungsi saat user memilih tanggal arsip tertentu
+const pilihArsip = (item: any) => {
+  imageUrl.value = item.image_url
+  selectedTanggal.value = new Date(item.created_at).toLocaleDateString('id-ID', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  })
+  showModalArsip.value = false
+}
+
+onMounted(async () => {
+  await ambilArsipMenu()
 })
 </script>
 
@@ -103,7 +124,6 @@ onMounted(async () => {
           class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white p-2.5 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110"
           title="Kunjungi TikTok Resmi Cabang"
         >
-          <!-- Ikon SVG TikTok -->
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
             <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
           </svg>
@@ -118,7 +138,6 @@ onMounted(async () => {
           class="bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 hover:opacity-90 text-white p-2.5 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110"
           title="Kunjungi Instagram Resmi Cabang"
         >
-          <!-- Ikon SVG Instagram -->
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
           </svg>
@@ -131,10 +150,7 @@ onMounted(async () => {
         
         <!-- BAGIAN DUA LOGO BERBENTUK BULAT -->
         <div class="flex items-center justify-center gap-3">
-          <!-- Logo MBG Utama -->
           <img :src="logoMbg" alt="Logo Badan Gizi Nasional" class="w-20 h-20 object-contain drop-shadow-md rounded-full bg-white p-1 border border-slate-700 shadow-lg" />
-          
-          <!-- Logo Yayasan Patra (Bentuk Bulat, KECUALI Cihampelas) -->
           <img v-if="isNotCihampelas" :src="logoYayasan" alt="Logo Yayasan Patra Nusantara Sakti" class="w-20 h-20 object-cover drop-shadow-md rounded-full bg-slate-900 border-2 border-amber-500/70 shadow-amber-500/20 shadow-lg" />
         </div>
 
@@ -146,13 +162,28 @@ onMounted(async () => {
         <!-- KOTAK TANGGAL OTOMATIS -->
         <div class="bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 text-xs px-4 py-1.5 rounded-full flex items-center gap-2 font-bold shadow-sm">
           <span>📅</span> 
-          <span>Menu Harian: {{ tanggalHariIni }}</span>
+          <span>Menu Harian: {{ selectedTanggal || tanggalHariIni }}</span>
         </div>
 
         <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 font-medium">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           Terverifikasi
         </div>
+      </div>
+
+      <!-- TOMBOL AKSES RIWAYAT ARSIP MENU (REQUEST CEO & HRD) -->
+      <div class="w-full flex justify-between items-center bg-slate-950 border border-slate-800 px-4 py-3 rounded-2xl">
+        <div class="text-xs">
+          <p class="text-slate-400">Cek menu hari sebelumnya?</p>
+          <p class="text-cyan-400 font-semibold" v-if="selectedTanggal">Menampilkan Arsip</p>
+          <p class="text-slate-500 text-[10px]" v-else>Menampilkan menu aktif hari ini</p>
+        </div>
+        <button 
+          @click="showModalArsip = true"
+          class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs px-3.5 py-2 rounded-xl font-medium transition-colors shadow flex items-center gap-1.5"
+        >
+          📂 Riwayat Menu
+        </button>
       </div>
 
       <!-- Kotak Poster Makanan -->
@@ -183,5 +214,46 @@ onMounted(async () => {
       </div>
 
     </div>
+
+    <!-- MODAL POPUP PILIHAN TANGGAL ARSIP -->
+    <div v-if="showModalArsip" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-5 space-y-4 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <div>
+            <h3 class="text-sm font-bold text-cyan-400">Riwayat Arsip Menu Cabang</h3>
+            <p class="text-[10px] text-slate-400">Pilih tanggal menu sebelumnya untuk evaluasi</p>
+          </div>
+          <button @click="showModalArsip = false" class="text-slate-400 hover:text-white text-sm font-bold p-2">✕</button>
+        </div>
+
+        <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+          <div 
+            v-for="(item, index) in riwayatMenu" 
+            :key="item.id"
+            @click="pilihArsip(item)"
+            class="bg-slate-950 hover:bg-slate-800 border border-slate-800 p-3.5 rounded-2xl cursor-pointer flex justify-between items-center transition-all"
+          >
+            <div>
+              <p class="text-xs font-semibold text-white flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full" :class="index === 0 ? 'bg-emerald-400' : 'bg-slate-500'"></span>
+                {{ index === 0 ? 'Menu Terbaru (Hari Ini)' : 'Arsip Menu' }}
+              </p>
+              <p class="text-[11px] text-slate-400 mt-0.5">
+                {{ new Date(item.created_at).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) }}
+              </p>
+            </div>
+            <span class="text-xs text-cyan-400 font-medium bg-cyan-500/10 px-2.5 py-1 rounded-lg border border-cyan-500/20">Lihat →</span>
+          </div>
+        </div>
+
+        <button 
+          @click="showModalArsip = false"
+          class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-2.5 rounded-xl font-medium transition-colors"
+        >
+          Tutup
+        </button>
+      </div>
+    </div>
+
   </div>
 </template>
