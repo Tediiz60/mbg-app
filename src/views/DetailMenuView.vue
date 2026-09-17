@@ -107,10 +107,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="bg-slate-950 text-white min-h-screen w-full py-8 px-4 flex flex-col items-center justify-start overflow-y-auto [-webkit-overflow-scrolling:touch]">
+  <div class="bg-slate-950 text-white w-full min-h-full py-8 px-4 flex flex-col items-center overflow-x-hidden">
     
-    <!-- Kontainer Utama -->
-    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 mb-24 pb-36 relative">
+    <!-- Kontainer Utama dengan padding bawah yang sangat besar agar bebas discroll sampai mentok -->
+    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 mb-32 pb-64 relative">
       
       <!-- TOMBOL SOSIAL MEDIA (TIKTOK & INSTAGRAM) DI POJOK KANAN ATAS -->
       <div class="absolute top-5 right-5 flex items-center gap-2">
@@ -186,7 +186,7 @@ onMounted(async () => {
         </button>
       </div>
 
-      <!-- Kotak Poster Makanan (Tampil full dan leluasa untuk di-scroll ke bawah) -->
+      <!-- Kotak Poster Makanan -->
       <div class="bg-slate-950 p-2 sm:p-4 rounded-2xl border border-slate-800 w-full flex flex-col items-center justify-center">
         <div v-if="isLoading" class="text-sm text-cyan-400 flex items-center gap-2 py-12">
           <svg class="animate-spin h-4 w-4 text-cyan-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -196,7 +196,7 @@ onMounted(async () => {
           Memuat poster...
         </div>
         
-        <!-- Gambar render penuh tanpa batas tinggi (h-auto w-full) -->
+        <!-- Gambar render penuh tanpa batas tinggi agar bebas discroll -->
         <img v-else-if="imageUrl" :src="imageUrl" alt="Poster Menu" class="w-full h-auto rounded-xl shadow-md block" />
         
         <div v-else class="text-sm text-slate-500 italic py-8">Belum ada poster menu aktif untuk cabang ini.</div>
