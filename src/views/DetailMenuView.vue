@@ -107,10 +107,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="bg-slate-950 text-white w-full min-h-full py-8 px-4 flex flex-col items-center overflow-x-hidden">
-    
-    <!-- Kontainer Utama dengan padding bawah yang sangat besar agar bebas discroll sampai mentok -->
-    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 mb-32 pb-64 relative">
+  <div class="menu-page-wrapper">
+    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 relative card-container">
       
       <!-- TOMBOL SOSIAL MEDIA (TIKTOK & INSTAGRAM) DI POJOK KANAN ATAS -->
       <div class="absolute top-5 right-5 flex items-center gap-2">
@@ -196,7 +194,7 @@ onMounted(async () => {
           Memuat poster...
         </div>
         
-        <!-- Gambar render penuh tanpa batas tinggi agar bebas discroll -->
+        <!-- Gambar render penuh -->
         <img v-else-if="imageUrl" :src="imageUrl" alt="Poster Menu" class="w-full h-auto rounded-xl shadow-md block" />
         
         <div v-else class="text-sm text-slate-500 italic py-8">Belum ada poster menu aktif untuk cabang ini.</div>
@@ -260,3 +258,27 @@ onMounted(async () => {
 
   </div>
 </template>
+
+<style scoped>
+/* Memaksa pembuka halaman untuk mengizinkan scrolling vertikal secara mutlak tanpa terhalang layout global */
+.menu-page-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100%;
+  background-color: #020617; /* bg-slate-950 */
+  color: #ffffff;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+}
+
+.card-container {
+  margin-bottom: 5rem;
+  padding-bottom: 8rem; /* Ruang kosong ekstra di bagian bawah supaya tidak mentok */
+}
+</style>
