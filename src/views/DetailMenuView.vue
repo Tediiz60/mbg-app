@@ -275,6 +275,7 @@ onMounted(async () => {
   color: #ffffff;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y !important; /* Tambahkan baris ini di sini */
   display: flex;
   flex-direction: column;
   align-items: center;
