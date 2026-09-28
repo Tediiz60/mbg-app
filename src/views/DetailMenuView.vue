@@ -157,11 +157,6 @@ onMounted(async () => {
           <p class="text-xs text-slate-400">Portal Verifikasi Menu Resmi</p>
         </div>
 
-        <!-- KOTAK NOTE UNTUK PENGGUNA HP -->
-        <div class="w-full bg-amber-500/10 border border-amber-500/30 text-amber-300 px-3 py-2 rounded-xl text-xs text-center leading-relaxed">
-          ⚠️ <span class="font-semibold">Note:</span> Jika HP kalian tidak bisa lihat ke bawah atau nggak bisa di-scroll, coba pakai <span class="font-bold underline">2 jari</span> untuk scroll layarnya ya!
-        </div>
-
         <!-- KOTAK TANGGAL OTOMATIS -->
         <div class="bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 text-xs px-4 py-1.5 rounded-full flex items-center gap-2 font-bold shadow-sm">
           <span>📅</span> 
@@ -266,28 +261,30 @@ onMounted(async () => {
 
 <style scoped>
 .menu-page-wrapper {
-  position: relative !important;
-  width: 100% !important;
-  min-height: 100vh !important;
-  height: auto !important;
-  background-color: #020617 !important;
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  height: auto;
+  background-color: #020617;
   color: #ffffff;
   overflow-y: visible !important;
-  -webkit-overflow-scrolling: touch !important;
+  -webkit-overflow-scrolling: touch;
   touch-action: pan-y !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  padding: 2rem 1rem 10rem 1rem !important;
-  box-sizing: border-box !important;
+  padding: 2rem 1rem 8rem 1rem;
+  box-sizing: border-box;
 }
 
 .card-container {
-  position: relative !important;
-  width: 100% !important;
-  max-width: 36rem !important;
-  margin: 0 auto 5rem auto !important;
-  padding-bottom: 6rem !important;
-  box-sizing: border-box !important;
+  display: block;
+  width: 100%;
+  max-width: 36rem;
+  margin: 0 auto;
+  background-color: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  margin-bottom: 4rem;
 }
 </style>
