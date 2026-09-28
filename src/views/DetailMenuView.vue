@@ -267,11 +267,9 @@ onMounted(async () => {
 <style scoped>
 /* Memaksa pembuka halaman untuk mengizinkan scrolling vertikal secara mutlak tanpa terhalang layout global */
 .menu-page-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
-  min-height: 100%;
+  min-height: 100vh;
   background-color: #020617; /* bg-slate-950 */
   color: #ffffff;
   overflow-y: auto !important;
