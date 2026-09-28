@@ -157,6 +157,11 @@ onMounted(async () => {
           <p class="text-xs text-slate-400">Portal Verifikasi Menu Resmi</p>
         </div>
 
+        <!-- KOTAK NOTE PANDUAN -->
+        <div class="w-full bg-amber-500/10 border border-amber-500/30 text-amber-300 px-3 py-2 rounded-xl text-xs text-center leading-relaxed">
+          ⚠️ <span class="font-semibold">Note:</span> Kalau HP kalian nggak bisa scrol coba zoom sedikit web nya nanti scroll
+        </div>
+
         <!-- KOTAK TANGGAL OTOMATIS -->
         <div class="bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 text-xs px-4 py-1.5 rounded-full flex items-center gap-2 font-bold shadow-sm">
           <span>📅</span> 
