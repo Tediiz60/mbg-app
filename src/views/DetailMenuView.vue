@@ -260,22 +260,28 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+/* Membuka seluruh interaksi sentuh dan scroll murni di level wrapper */
 .menu-page-wrapper {
-  display: block;
+  position: relative;
   width: 100%;
   min-height: 100vh;
   height: auto;
   background-color: #020617;
   color: #ffffff;
-  overflow-y: visible !important;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y !important;
-  padding: 2rem 1rem 8rem 1rem;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y pinch-zoom !important;
+  pointer-events: auto !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem 10rem 1rem;
   box-sizing: border-box;
 }
 
+/* Memastikan card di dalam tidak memblokir sentuhan scroll */
 .card-container {
-  display: block;
+  position: relative;
   width: 100%;
   max-width: 36rem;
   margin: 0 auto;
@@ -286,5 +292,7 @@ onMounted(async () => {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
   margin-bottom: 4rem;
+  pointer-events: auto !important;
+  touch-action: pan-y !important;
 }
 </style>
