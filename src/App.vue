@@ -1,26 +1,17 @@
 <template>
-  <router-view />
+  <div class="min-h-screen bg-slate-900 text-white w-full overflow-y-auto">
+    <router-view />
+  </div>
 </template>
 
 <script setup lang="ts">
 </script>
 
 <style>
-/* Reset universal agar seluruh browser HP dan PC mengizinkan scroll natural */
-html, body {
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100% !important;
-  min-height: 100vh !important;
-  background-color: #020617 !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important;
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0f1f2a;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
-
-#app {
-  width: 100% !important;
-  min-height: 100vh !important;
-  overflow-y: auto !important;
-}
-</style>
+</style>s
