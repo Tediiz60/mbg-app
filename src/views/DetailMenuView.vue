@@ -157,11 +157,6 @@ onMounted(async () => {
           <p class="text-xs text-slate-400">Portal Verifikasi Menu Resmi</p>
         </div>
 
-        <!-- TAMBAHAN KOTAK NOTE UNTUK PENGGUNA HP -->
-        <div class="w-full bg-amber-500/10 border border-amber-500/30 text-amber-300 px-3 py-2 rounded-xl text-xs text-center leading-relaxed">
-          ⚠️ <span class="font-semibold">Note:</span> Jika HP kalian tidak bisa lihat ke bawah atau nggak bisa di-scroll, coba pakai <span class="font-bold underline">2 jari</span> untuk scroll layarnya ya!
-        </div>
-
         <!-- KOTAK TANGGAL OTOMATIS -->
         <div class="bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 text-xs px-4 py-1.5 rounded-full flex items-center gap-2 font-bold shadow-sm">
           <span>📅</span> 
@@ -221,7 +216,7 @@ onMounted(async () => {
 
     </div>
 
-    <!-- MODAL POPUP PILIHAN TANGGAL ARSIP -->
+    <!-- MODAL POPUP PILIHAN TANGGAL ARsip -->
     <div v-if="showModalArsip" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-5 space-y-4 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -266,22 +261,23 @@ onMounted(async () => {
 
 <style scoped>
 .menu-page-wrapper {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  min-height: 100vh;
-  height: auto;
+  min-height: 100%;
   background-color: #020617;
   color: #ffffff;
-  overflow-y: auto;
+  overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 1rem 8rem 1rem;
+  padding: 2rem 1rem;
 }
 
 .card-container {
-  margin-bottom: 2rem;
-  padding-bottom: 2rem;
+  margin-bottom: 5rem;
+  padding-bottom: 8rem;
 }
 </style>
