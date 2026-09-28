@@ -157,7 +157,7 @@ onMounted(async () => {
           <p class="text-xs text-slate-400">Portal Verifikasi Menu Resmi</p>
         </div>
 
-        <!-- TAMBAHAN KOTAK NOTE UNTUK PENGGUNA HP -->
+        <!-- KOTAK NOTE UNTUK PENGGUNA HP -->
         <div class="w-full bg-amber-500/10 border border-amber-500/30 text-amber-300 px-3 py-2 rounded-xl text-xs text-center leading-relaxed">
           ⚠️ <span class="font-semibold">Note:</span> Jika HP kalian tidak bisa lihat ke bawah atau nggak bisa di-scroll, coba pakai <span class="font-bold underline">2 jari</span> untuk scroll layarnya ya!
         </div>
@@ -275,7 +275,6 @@ onMounted(async () => {
   color: #ffffff;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-y; /* Memaksa Android mengizinkan sentuhan scroll vertikal 1 jari */
   display: flex;
   flex-direction: column;
   align-items: center;
