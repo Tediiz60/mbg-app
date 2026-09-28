@@ -157,6 +157,11 @@ onMounted(async () => {
           <p class="text-xs text-slate-400">Portal Verifikasi Menu Resmi</p>
         </div>
 
+        <!-- TAMBAHAN KOTAK NOTE UNTUK PENGGUNA HP -->
+        <div class="w-full bg-amber-500/10 border border-amber-500/30 text-amber-300 px-3 py-2 rounded-xl text-xs text-center leading-relaxed">
+          ⚠️ <span class="font-semibold">Note:</span> Jika HP kalian tidak bisa lihat ke bawah atau nggak bisa di-scroll, coba pakai <span class="font-bold underline">2 jari</span> untuk scroll layarnya ya!
+        </div>
+
         <!-- KOTAK TANGGAL OTOMATIS -->
         <div class="bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 text-xs px-4 py-1.5 rounded-full flex items-center gap-2 font-bold shadow-sm">
           <span>📅</span> 
@@ -260,13 +265,14 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+/* Memaksa pembuka halaman untuk mengizinkan scrolling vertikal secara mutlak tanpa terhalang layout global */
 .menu-page-wrapper {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   min-height: 100%;
-  background-color: #020617;
+  background-color: #020617; /* bg-slate-950 */
   color: #ffffff;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
@@ -278,6 +284,6 @@ onMounted(async () => {
 
 .card-container {
   margin-bottom: 5rem;
-  padding-bottom: 8rem;
+  padding-bottom: 8rem; /* Ruang kosong ekstra di bagian bawah supaya tidak mentok */
 }
 </style>
