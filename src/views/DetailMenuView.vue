@@ -108,7 +108,7 @@ onMounted(async () => {
 
 <template>
   <div class="menu-page-wrapper">
-    <div class="card-container space-y-6">
+    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 relative card-container">
       
       <!-- TOMBOL SOSIAL MEDIA (TIKTOK & INSTAGRAM) DI POJOK KANAN ATAS -->
       <div class="absolute top-5 right-5 flex items-center gap-2">
@@ -261,30 +261,23 @@ onMounted(async () => {
 
 <style scoped>
 .menu-page-wrapper {
-  position: static !important;
-  display: block !important;
-  width: 100% !important;
-  min-height: 100vh !important;
-  height: auto !important;
-  background-color: #020617 !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100%;
+  background-color: #020617;
   color: #ffffff;
-  overflow: visible !important;
+  overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
-  padding: 2rem 1rem 12rem 1rem !important;
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
 }
 
 .card-container {
-  position: relative !important;
-  display: block !important;
-  width: 100% !important;
-  max-width: 36rem !important;
-  margin: 0 auto !important;
-  padding: 1.5rem !important;
-  background-color: #0f172a !important;
-  border: 1px solid #1e293b !important;
-  border-radius: 1.5rem !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
-  box-sizing: border-box;
+  margin-bottom: 5rem;
+  padding-bottom: 8rem;
 }
 </style>
