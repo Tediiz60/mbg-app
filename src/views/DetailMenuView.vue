@@ -265,23 +265,23 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-/* Memaksa pembuka halaman untuk mengizinkan scrolling vertikal secara mutlak tanpa terhalang layout global */
 .menu-page-wrapper {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  background-color: #020617; /* bg-slate-950 */
+  height: auto;
+  background-color: #020617;
   color: #ffffff;
-  overflow-y: auto !important;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 1rem;
+  padding: 2rem 1rem 8rem 1rem;
 }
 
 .card-container {
-  margin-bottom: 5rem;
-  padding-bottom: 8rem; /* Ruang kosong ekstra di bagian bawah supaya tidak mentok */
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
 }
 </style>
