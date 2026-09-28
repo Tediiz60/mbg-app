@@ -266,24 +266,26 @@ onMounted(async () => {
 
 <style scoped>
 .menu-page-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
-  min-height: 100%;
+  min-height: 100vh;
+  height: auto;
   background-color: #020617;
   color: #ffffff;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-y !important; /* Tambahkan baris ini di sini */
+  touch-action: pan-y !important;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 1rem;
+  padding: 2rem 1rem 8rem 1rem;
 }
 
 .card-container {
-  margin-bottom: 5rem;
-  padding-bottom: 8rem;
+  position: relative;
+  width: 100%;
+  max-width: 36rem;
+  margin-bottom: 3rem;
+  padding-bottom: 4rem;
 }
 </style>
