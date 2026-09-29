@@ -266,23 +266,26 @@ onMounted(async () => {
 
 <style scoped>
 .menu-page-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  min-height: 100%;
-  background-color: #020617;
+  position: relative !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  height: auto !important;
+  background-color: #020617 !important;
   color: #ffffff;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem 1rem;
+  overflow-y: visible !important;
+  -webkit-overflow-scrolling: touch !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  padding: 2rem 1rem 8rem 1rem !important;
+  box-sizing: border-box !important;
 }
 
 .card-container {
-  margin-bottom: 5rem;
-  padding-bottom: 8rem;
+  position: relative !important;
+  width: 100% !important;
+  max-width: 36rem !important;
+  margin: 0 auto 4rem auto !important;
+  box-sizing: border-box !important;
 }
 </style>
